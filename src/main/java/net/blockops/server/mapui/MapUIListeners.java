@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 public class MapUIListeners implements Listener {
 
@@ -33,18 +34,23 @@ public class MapUIListeners implements Listener {
     }
 
     @EventHandler
-    public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+    public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+        this.mapUIManager.onPlayerToggleSneakEvent(event);
+    }
 
+    @EventHandler
+    public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+        this.mapUIManager.onPlayerItemHeldEvent(event);
     }
 
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
-
+        this.mapUIManager.onPlayerDropItemEvent(event);
     }
 
     @EventHandler
     public void onPlayerSwapItemEvent(PlayerSwapHandItemsEvent event) {
-        event.setCancelled(true); // Player should only use Drop Item 'Q' key to exit MapUI
+        this.mapUIManager.onPlayerSwapItemEvent(event);
     }
 
     @EventHandler

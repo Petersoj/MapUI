@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -21,6 +22,7 @@ public class MapUIManager {
 
     private Plugin plugin;
     private int emptyMapID;
+
     private MapUIListeners mapUIListeners;
     private HashMap<Player, MapUI> playerMapUIs;
     private ItemStack peripheralBlockItem;
@@ -76,16 +78,21 @@ public class MapUIManager {
         }
     }
 
-    public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+    public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+        this.playerMapUIs.get(event.getPlayer()).close();
+    }
 
+    public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+        this.playerMapUIs.get(event.getPlayer()).close();
     }
 
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
-
+        event.setCancelled(true);
+        this.playerMapUIs.get(event.getPlayer()).close();
     }
 
     public void onPlayerSwapItemEvent(PlayerSwapHandItemsEvent event) {
-
+        event.setCancelled(true); // Player should only use Drop Item 'Q' key to exit MapUI
     }
 
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
@@ -97,7 +104,19 @@ public class MapUIManager {
         return plugin;
     }
 
+    public int getEmptyMapID() {
+        return emptyMapID;
+    }
+
     public ItemStack getPeripheralBlockItem() {
         return peripheralBlockItem;
+    }
+
+    public Location getArmorStandLocOffset() {
+        return armorStandLocOffset;
+    }
+
+    public EulerAngle getArmorStandHeadPoseOverride() {
+        return armorStandHeadPoseOverride;
     }
 }
