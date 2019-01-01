@@ -1,11 +1,6 @@
 package net.blockops.server.mapui.component.components;
 
-import net.blockops.server.mapui.component.MapComponent;
+public class MapCursor {
 
-public class MapCursor extends MapComponent {
-
-    public void setLocation(int x, int y) {
-
-    }
-
+    // Make sure that previousPixel are in fact the color that was previously there before setting pixel to previous.
 }

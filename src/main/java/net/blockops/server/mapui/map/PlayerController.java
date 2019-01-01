@@ -9,7 +9,7 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class MapUIPlayerController {
+public class PlayerController {
 
     private MapUI mapUI;
     private Player player;
@@ -33,7 +33,7 @@ public class MapUIPlayerController {
     private DataWatcher tempDataWatcher;
     private DataWatcher entityPlayerDataWatcher;
 
-    public MapUIPlayerController(MapUI mapUI) {
+    public PlayerController(MapUI mapUI) {
         this.mapUI = mapUI;
         this.player = mapUI.getPlayer();
 
@@ -65,7 +65,7 @@ public class MapUIPlayerController {
 
         this.setClientInvisible(true);
 
-        // TODO collision prevention
+        // TODO collision prevention (use either previous scoreboard or new scoreboard)
     }
 
     public void onUIUpdate() {

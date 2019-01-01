@@ -1,6 +1,8 @@
 package net.blockops.server.mapui;
 
+import net.blockops.server.mapui.font.SmallMinecraftFont;
 import net.blockops.server.mapui.map.MapUI;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -14,6 +16,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.map.MapRenderer;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
@@ -21,21 +25,31 @@ import java.util.HashMap;
 public class MapUIManager {
 
     private Plugin plugin;
-    private int emptyMapID;
+    private short emptyMapID;
+    private MapView mapView;
 
+    private SmallMinecraftFont smallMinecraftFont;
     private MapUIListeners mapUIListeners;
+    private MainRenderer mainRenderer;
     private HashMap<Player, MapUI> playerMapUIs;
 
-    public MapUIManager(Plugin plugin, int emptyMapID) {
+    public MapUIManager(Plugin plugin, short emptyMapID) {
         this.plugin = plugin;
         this.emptyMapID = emptyMapID;
 
         this.mapUIListeners = new MapUIListeners(this);
+        this.mainRenderer = new MainRenderer(this);
         this.playerMapUIs = new HashMap<>();
     }
 
     public void init() {
         mapUIListeners.registerEvents();
+
+        mapView = Bukkit.getMap(emptyMapID);
+        for (MapRenderer mapRenderer : mapView.getRenderers()) {
+            mapView.removeRenderer(mapRenderer);
+        }
+        mapView.addRenderer(mainRenderer);
     }
 
     public void deinit() {
@@ -43,12 +57,6 @@ public class MapUIManager {
             mapUI.close();
         }
         playerMapUIs.clear();
-    }
-
-    public MapUI createMapUI(Player player) {
-        MapUI mapUI = new MapUI(this, player);
-        mapUI.init();
-        return mapUI;
     }
 
     // -- Event Handlers --
@@ -138,8 +146,20 @@ public class MapUIManager {
         return plugin;
     }
 
-    public int getEmptyMapID() {
-        return emptyMapID;
+    public MapView getMapView() {
+        return mapView;
+    }
+
+    public SmallMinecraftFont getSmallMinecraftFont() {
+        if (smallMinecraftFont == null) {
+            try {
+                smallMinecraftFont = new SmallMinecraftFont();
+                smallMinecraftFont.createFont();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return smallMinecraftFont;
     }
 
     public HashMap<Player, MapUI> getPlayerMapUIs() {

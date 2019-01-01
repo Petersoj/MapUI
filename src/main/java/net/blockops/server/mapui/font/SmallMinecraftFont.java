@@ -7,9 +7,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class BlockOpsFont extends MapFont {
+public class SmallMinecraftFont extends MapFont {
 
-    private final String fontSpritesheetPath = "/Block Ops Font.png";
+    private final String fontSpritesheetPath = "/Small Minecraft Font.png";
     private final int spriteHeight = 7;
     private final int spriteWidth = 7;
     private final int standardCharHeight = 5;
@@ -21,7 +21,7 @@ public class BlockOpsFont extends MapFont {
     };
 
 
-    public BlockOpsFont() {
+    public SmallMinecraftFont() {
     }
 
     public void createFont() throws IOException {
@@ -65,5 +65,9 @@ public class BlockOpsFont extends MapFont {
 
         CharacterSprite spaceCharacterSprite = new CharacterSprite(2, spriteHeight, new boolean[2 * spriteHeight]);
         this.setChar(' ', spaceCharacterSprite);
+    }
+
+    public int getStandardCharHeight() {
+        return standardCharHeight;
     }
 }
