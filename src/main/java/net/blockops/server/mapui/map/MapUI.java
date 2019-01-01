@@ -1,20 +1,22 @@
 package net.blockops.server.mapui.map;
 
 import net.blockops.server.mapui.MapUIManager;
-import net.minecraft.server.v1_13_R2.EntityArmorStand;
-import net.minecraft.server.v1_13_R2.EntityPlayer;
-import net.minecraft.server.v1_13_R2.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_13_R2.PacketPlayOutSpawnEntityLiving;
+import net.minecraft.server.v1_13_R2.EnumItemSlot;
+import net.minecraft.server.v1_13_R2.PacketPlayOutEntityEquipment;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.EulerAngle;
 
 public class MapUI {
 
@@ -26,12 +28,25 @@ public class MapUI {
     private boolean isOpen = false;
     private BukkitTask updateTask;
     private ArmorStand peripheralBlockArmorStand;
+    private ItemStack peripheralBlockItem;
+    private Location peripheralBlockLocOffset;
+    private EulerAngle peripheralBlockHeadPose;
+
 
     public MapUI(MapUIManager mapUIManager, Player player) {
         this.mapUIManager = mapUIManager;
         this.player = player;
 
         this.mapUIPlayerController = new MapUIPlayerController(this);
+    }
+
+    public void init() {
+        mapUIManager.getPlayerMapUIs().put(player, this);
+        this.mapUIPlayerController.init();
+    }
+
+    public void deinit() {
+        this.mapUIPlayerController.deinit();
     }
 
     public void open(String mapItemName, boolean createUpdateTask) {
@@ -71,10 +86,10 @@ public class MapUI {
     }
 
     public void onClick() {
-
+        Bukkit.broadcastMessage("Clicked!");
     }
 
-    public void createMapItem(String mapItemName) {
+    private void createMapItem(String mapItemName) {
         mapItem = new ItemStack(Material.FILLED_MAP);
         MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
 
@@ -84,44 +99,49 @@ public class MapUI {
         mapItem.setItemMeta(mapMeta);
     }
 
-    public void createPeripheralBlockArmorStand() {
-        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-        EntityArmorStand entityArmorStand = new EntityArmorStand(entityPlayer.world);
-
-        peripheralBlockArmorStand = (ArmorStand) entityArmorStand.getBukkitEntity();
+    private void createPeripheralBlockArmorStand() {
+        Location cursorCenterLocation = mapUIPlayerController.getCursorCenterLocation().clone();
+        if (peripheralBlockLocOffset != null) {
+            cursorCenterLocation.add(peripheralBlockLocOffset);
+        }
+        peripheralBlockArmorStand =
+                (ArmorStand) player.getWorld().spawnEntity(cursorCenterLocation, EntityType.ARMOR_STAND);
         peripheralBlockArmorStand.setVisible(false);
         peripheralBlockArmorStand.setInvulnerable(true);
+        peripheralBlockArmorStand.setGravity(false);
+        peripheralBlockArmorStand.setArms(true); // So the player can interact with the AS
 
-        if (mapUIManager.getPeripheralBlockItem() != null) {
-            peripheralBlockArmorStand.setHelmet(mapUIManager.getPeripheralBlockItem());
+        if (peripheralBlockHeadPose != null) {
+            peripheralBlockArmorStand.setHeadPose(peripheralBlockHeadPose);
         }
-        if (mapUIManager.getArmorStandHeadPoseOverride() != null) {
-            peripheralBlockArmorStand.setHeadPose(mapUIManager.getArmorStandHeadPoseOverride());
-        }
-        Location initialLocation = mapUIPlayerController.getInitialLocation();
-        if (mapUIManager.getArmorStandLocOffset() != null) {
-            initialLocation.add(mapUIManager.getArmorStandLocOffset());
-        }
-        entityArmorStand.setLocation(initialLocation.getX(), initialLocation.getY(),
-                initialLocation.getZ(), initialLocation.getYaw() - 180, 0f);
 
-        PacketPlayOutSpawnEntityLiving spawnEntityPacket = new PacketPlayOutSpawnEntityLiving(entityArmorStand);
-        entityPlayer.playerConnection.sendPacket(spawnEntityPacket);
+        // Send Equipment packet with peripheralBlockItem later cause this tick will override it on the client...
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                PacketPlayOutEntityEquipment equipmentPacket =
+                        new PacketPlayOutEntityEquipment(peripheralBlockArmorStand.getEntityId(),
+                                EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(peripheralBlockItem));
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
+            }
+        }.runTaskLater(mapUIManager.getPlugin(), 2);
     }
 
-    public void destroyPeripheralBlockArmorStand() {
-        PacketPlayOutEntityDestroy entityDestroyPacket =
-                new PacketPlayOutEntityDestroy(peripheralBlockArmorStand.getEntityId());
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityDestroyPacket);
+    private void destroyPeripheralBlockArmorStand() {
+        peripheralBlockArmorStand.remove();
     }
 
-    public void createUpdateTask() {
+    private void createUpdateTask() {
         this.updateTask = new BukkitRunnable() {
             @Override
             public void run() {
                 MapUI.this.update(false);
             }
         }.runTaskTimer(mapUIManager.getPlugin(), 0, 0);
+    }
+
+    public MapUIManager getMapUIManager() {
+        return mapUIManager;
     }
 
     public ArmorStand getPeripheralBlockArmorStand() {
@@ -139,4 +159,29 @@ public class MapUI {
     public Player getPlayer() {
         return player;
     }
+
+    public ItemStack getPeripheralBlockItem() {
+        return peripheralBlockItem;
+    }
+
+    public void setPeripheralBlockItem(ItemStack peripheralBlockItem) {
+        this.peripheralBlockItem = peripheralBlockItem;
+    }
+
+    public Location getPeripheralBlockLocOffset() {
+        return peripheralBlockLocOffset;
+    }
+
+    public void setPeripheralBlockLocOffset(Location peripheralBlockLocOffset) {
+        this.peripheralBlockLocOffset = peripheralBlockLocOffset;
+    }
+
+    public EulerAngle getPeripheralBlockHeadPose() {
+        return peripheralBlockHeadPose;
+    }
+
+    public void setPeripheralBlockHeadPose(EulerAngle peripheralBlockHeadPose) {
+        this.peripheralBlockHeadPose = peripheralBlockHeadPose;
+    }
+
 }

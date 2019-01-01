@@ -3,10 +3,12 @@ package net.blockops.server.mapui;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -34,6 +36,11 @@ public class MapUIListeners implements Listener {
     }
 
     @EventHandler
+    public void onPlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+        this.mapUIManager.onPlayerArmorStandManipulateEvent(event);
+    }
+
+    @EventHandler
     public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
         this.mapUIManager.onPlayerToggleSneakEvent(event);
     }
@@ -58,4 +65,8 @@ public class MapUIListeners implements Listener {
         this.mapUIManager.onPlayerQuitEvent(event);
     }
 
+    @EventHandler
+    public void onPlayerKickEvent(PlayerKickEvent event) {
+        this.mapUIManager.onPlayerKickEvent(event);
+    }
 }

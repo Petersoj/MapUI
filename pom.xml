@@ -6,7 +6,7 @@
 
     <groupId>net.blockops.server</groupId>
     <artifactId>mapui</artifactId>
-    <version>1.0</version>
+    <version>1.0-MC-1.13.2</version>
 
     <dependencies>
         <dependency>
