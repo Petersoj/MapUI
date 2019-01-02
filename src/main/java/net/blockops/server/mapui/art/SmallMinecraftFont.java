@@ -20,7 +20,6 @@ public class SmallMinecraftFont extends MapFont {
             "<>{}[]"
     };
 
-
     public SmallMinecraftFont() {
     }
 

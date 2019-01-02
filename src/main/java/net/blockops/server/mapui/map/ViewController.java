@@ -33,12 +33,7 @@ public class ViewController {
         }
 
         for (MapComponent mapComponent : mapComponents) {
-            if (mapComponent instanceof MapButton) {
-                MapButton mapButton = (MapButton) mapComponent;
-                if (mapButton.isClicked()) {
-                    mapButton.setClicked(false); // Clicked should only happen for one tick.
-                }
-            }
+            mapComponent.update();
         }
 
         if (playerController.didPlayerMoveCursor()) {
@@ -63,15 +58,17 @@ public class ViewController {
                             topMostHoveredButton = mapButton;
                         } else {
                             if (mapButton.isHovered()) {
-                                mapButton.onHoverExit(mapCanvas, mapCursor);
                                 mapButton.setHovered(false);
+                                mapButton.onHoverExit(mapCursor);
+                                this.dirty = true;
                             }
                         }
                     }
                 }
-                if (topMostHoveredButton != null) {
-                    topMostHoveredButton.onHoverEnter(mapCanvas, mapCursor);
+                if (topMostHoveredButton != null && !topMostHoveredButton.isHovered()) {
                     topMostHoveredButton.setHovered(true);
+                    topMostHoveredButton.onHoverEnter(mapCursor);
+                    this.dirty = true;
                 }
             }
         }
@@ -103,21 +100,17 @@ public class ViewController {
         if (mapCursor == null) {
             return;
         }
-        MapButton topMostClickedButton = null;
         for (MapComponent mapComponent : mapComponents) {
             if (mapComponent instanceof MapButton) {
                 MapButton mapButton = (MapButton) mapComponent;
 
-                mapCursor.updateCursorSensitivityLocation();
-
-                if (mapButton.getClickBounds().intersects(mapCursor.getCursorSensitivityBounds())) {
-                    topMostClickedButton = mapButton;
+                if (mapButton.isHovered()) { // Only one button is allowed to be hovered over at a time
+                    mapButton.setClicked(true);
+                    mapButton.onClick(mapCursor);
+                    this.dirty = true;
+                    break;
                 }
             }
-        }
-        if (topMostClickedButton != null) {
-            topMostClickedButton.onClick(mapCanvas, mapCursor);
-            topMostClickedButton.setClicked(true);
         }
     }
 

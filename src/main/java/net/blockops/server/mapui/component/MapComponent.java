@@ -11,6 +11,11 @@ public abstract class MapComponent {
 
     public abstract void draw(MapCanvas mapCanvas);
 
+    // Convenient method if a MapComponent needs to update every tick
+    // This method is called before draw()
+    public void update() {
+    }
+
     protected byte[][] getPixels(MapCanvas mapCanvas, int x, int y, int width, int height, byte[][] pixels) {
         if (pixels == null) {
             pixels = new byte[height][width];
@@ -36,10 +41,22 @@ public abstract class MapComponent {
         }
     }
 
+    protected void drawRectangle(MapCanvas mapCanvas, Rectangle rectangle, boolean fill, byte color) {
+        this.drawRectangle(mapCanvas, rectangle.x, rectangle.y, rectangle.width, rectangle.height, fill, color);
+    }
+
     protected void drawRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, boolean fill, byte color) {
-        for (int xx = x; xx < width; xx++) {
-            for (int yy = y; yy < height; yy++) {
-                mapCanvas.setPixel(xx, yy, color);
+        for (int xx = x; xx < width + x; xx++) {
+            for (int yy = y; yy < height + y; yy++) {
+                if (fill) {
+                    mapCanvas.setPixel(xx, yy, color);
+                } else {
+                    if (yy == y || yy == y + height - 1) {
+                        mapCanvas.setPixel(xx, yy, color);
+                    } else if (xx == x || xx == x + width - 1) {
+                        mapCanvas.setPixel(xx, yy, color);
+                    }
+                }
             }
         }
     }

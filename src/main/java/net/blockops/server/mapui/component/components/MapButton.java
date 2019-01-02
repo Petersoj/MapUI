@@ -1,7 +1,6 @@
 package net.blockops.server.mapui.component.components;
 
 import net.blockops.server.mapui.component.MapComponent;
-import org.bukkit.map.MapCanvas;
 
 import java.awt.Rectangle;
 
@@ -29,11 +28,24 @@ public abstract class MapButton extends MapComponent {
 
     // draw() should be implemented by a child class (and it will draw the unaltered MapButton)
 
-    public abstract void onClick(MapCanvas mapCanvas, MapCursor mapCursor);
+    @Override
+    public void update() {
+        if (clicked) {
+            clicked = false; // Clicked should only be true for one tick
+        }
+    }
 
-    public abstract void onHoverEnter(MapCanvas mapCanvas, MapCursor mapCursor);
+    public void onClick(MapCursor mapCursor) {
 
-    public abstract void onHoverExit(MapCanvas mapCanvas, MapCursor mapCursor);
+    }
+
+    public void onHoverEnter(MapCursor mapCursor) {
+
+    }
+
+    public void onHoverExit(MapCursor mapCursor) {
+
+    }
 
     public MapText getMapText() {
         return mapText;

@@ -10,6 +10,7 @@ public class MapCursor extends MapComponent {
 
     private byte[][] cursorPixels = new byte[][]{{MapUIColors.WHITE}}; // Default Single white dot cursor
     private Rectangle cursorSensitivityBounds = new Rectangle();
+    private Rectangle relativeCursorSensitivityBounds = new Rectangle();
     private byte[][] previousPixels;
     private int previousX;
     private int previousY;
@@ -35,11 +36,14 @@ public class MapCursor extends MapComponent {
         if (cursorPixels == null) {
             return;
         }
-        previousX = getX();
-        previousY = getY();
-        previousPixels = super.getPixels(mapCanvas, previousX, previousY, cursorPixels.length,
+        int clampedX = getX() > 127 ? 127 : getX();
+        int clampedY = getY() > 127 ? 127 : getY();
+        previousX = clampedX;
+        previousY = clampedY;
+        previousPixels = super.getPixels(mapCanvas, clampedX, clampedY, cursorPixels.length,
                 cursorPixels[0].length, previousPixels); // Samples pixels and creates array if necessary
-        super.drawPixels(mapCanvas, getX(), getY(), cursorPixels, false);
+
+        super.drawPixels(mapCanvas, clampedX, clampedY, cursorPixels, false);
     }
 
     public void setColor(byte color) {
@@ -63,11 +67,16 @@ public class MapCursor extends MapComponent {
     }
 
     public void updateCursorSensitivityLocation() {
-        cursorSensitivityBounds.x = getX();
-        cursorSensitivityBounds.y = getY();
+        cursorSensitivityBounds.x = relativeCursorSensitivityBounds.x + getX();
+        cursorSensitivityBounds.y = relativeCursorSensitivityBounds.y + getY();
     }
 
-    public void setCursorSensitivityBounds(int width, int height) {
+    public void setCursorSensitivityBounds(int relativeX, int relativeY, int width, int height) {
+        this.relativeCursorSensitivityBounds.x = relativeX;
+        this.relativeCursorSensitivityBounds.y = relativeY;
+        this.relativeCursorSensitivityBounds.width = width;
+        this.relativeCursorSensitivityBounds.height = height;
+
         this.cursorSensitivityBounds.width = width;
         this.cursorSensitivityBounds.height = height;
     }
