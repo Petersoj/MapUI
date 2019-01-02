@@ -20,22 +20,22 @@ public abstract class MapComponent {
         if (pixels == null) {
             pixels = new byte[height][width];
         }
-        for (int row = y; row < height; row++) {
-            for (int col = x; col < width; col++) {
-                pixels[row][col] = mapCanvas.getPixel(col, row);
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                pixels[row][col] = mapCanvas.getPixel(col + x, row + y);
             }
         }
         return pixels;
     }
 
     protected void drawPixels(MapCanvas mapCanvas, int x, int y, byte[][] pixels, boolean drawTransparency) {
-        for (int row = y; row < pixels.length; row++) {
-            for (int col = x; col < pixels[0].length; col++) {
+        for (int row = 0; row < pixels.length; row++) {
+            for (int col = 0; col < pixels[0].length; col++) {
                 byte pixel = pixels[row][col];
                 if (drawTransparency) {
-                    mapCanvas.setPixel(col, row, pixel);
+                    mapCanvas.setPixel(col + x, row + y, pixel);
                 } else if (pixel != 0) {
-                    mapCanvas.setPixel(col, row, pixel);
+                    mapCanvas.setPixel(col + x, row + y, pixel);
                 }
             }
         }

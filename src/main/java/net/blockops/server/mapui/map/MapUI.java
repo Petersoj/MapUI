@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapCanvas;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 
@@ -18,9 +20,11 @@ public class MapUI {
     private MapUIManager mapUIManager;
     private Player player;
 
+    private BukkitTask updateTask;
     private PlayerController playerController;
     private MapPeripheralBlock mapPeripheralBlock;
     private ArrayList<MapComponent> mapComponents;
+    private MapCanvas mapCanvas;
     private boolean dirty = false;
     private MapCursor mapCursor;
     private ItemStack mapItem;
@@ -44,21 +48,30 @@ public class MapUI {
         this.playerController.deinit();
     }
 
-    public void open(String mapItemName) {
+    public void open(String mapItemName, boolean createUpdateTask) {
         Validate.isTrue(!isOpen, "MapUI must be closed in order to open it!");
 
         this.createMapItem(mapItemName);
         this.playerController.onUIOpen();
         this.mapPeripheralBlock.createPeripheralBlockArmorStand();
 
+        if (createUpdateTask) {
+            this.createUpdateTask();
+        }
+
         this.isOpen = true;
     }
 
-    // Method should be called every tick (by MainRenderer object)
-    public void update(MapCanvas mapCanvas) {
+    public void update() {
         Validate.isTrue(isOpen, "MapUI must be open in order to update it!");
 
         this.playerController.onUIUpdate();
+
+        // - Drawing -
+
+        if (mapCanvas == null) {
+            return;
+        }
 
         if (playerController.didPlayerMoveCursor() && mapCursor != null) {
             mapCursor.setLocation(playerController.getX(), playerController.getY());
@@ -69,7 +82,6 @@ public class MapUI {
         }
 
         if (dirty) {
-            Bukkit.broadcastMessage("Dirty Draw");
             if (mapCursor != null) {
                 mapCursor.drawPreviousPixels(mapCanvas);
             }
@@ -92,6 +104,10 @@ public class MapUI {
 
         this.playerController.onUIClose();
         this.mapPeripheralBlock.destroyPeripheralBlockArmorStand();
+
+        if (updateTask != null) {
+            updateTask.cancel();
+        }
 
         this.isOpen = false;
     }
@@ -122,6 +138,15 @@ public class MapUI {
         mapItem.setItemMeta(mapMeta);
     }
 
+    private void createUpdateTask() {
+        updateTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                MapUI.this.update();
+            }
+        }.runTaskTimer(mapUIManager.getPlugin(), 0, 0);
+    }
+
     public MapUIManager getMapUIManager() {
         return mapUIManager;
     }
@@ -136,6 +161,14 @@ public class MapUI {
 
     public ArrayList<MapComponent> getMapComponents() {
         return mapComponents;
+    }
+
+    public MapCanvas getMapCanvas() {
+        return mapCanvas;
+    }
+
+    public void setMapCanvas(MapCanvas mapCanvas) {
+        this.mapCanvas = mapCanvas;
     }
 
     public boolean isDirty() {

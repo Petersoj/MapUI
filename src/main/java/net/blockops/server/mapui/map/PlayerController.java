@@ -93,34 +93,20 @@ public class PlayerController {
             return;
         }
 
-        boolean outOfBounds = false;
         float pitch = location.getPitch();
         float yaw = location.getYaw();
-        if (pitch < centerPitch - pitchBound) {
-            outOfBounds = true;
-            location.setPitch(centerPitch - pitchBound);
-            player.teleport(location);
-        }
-        float rightBoundYaw = cursorCenterLocation.getYaw() + yawBound;
-        if (yaw > rightBoundYaw) {
-            outOfBounds = true;
-            location.setYaw(rightBoundYaw);
-            player.teleport(location);
-        }
-        float leftBoundYaw = cursorCenterLocation.getYaw() - yawBound;
-        if (yaw < leftBoundYaw) {
-            outOfBounds = true;
-            location.setYaw(leftBoundYaw);
+
+        boolean outOfBounds = clampToBounds(location);
+        if (outOfBounds) {
             player.teleport(location);
         }
 
         if (!outOfBounds) {
-            playerMovedCursor = pitch != lastPitch && yaw != lastYaw;
+            playerMovedCursor = pitch != lastPitch || yaw != lastYaw;
             lastPitch = pitch;
             lastYaw = yaw;
 
             if (playerMovedCursor) {
-                System.out.println("Player Pitch/Yaw = " + pitch + " " + yaw);
                 this.calculateCursorPosition(pitch, yaw);
             }
         }
@@ -145,9 +131,37 @@ public class PlayerController {
         this.y = y;
     }
 
+    private boolean clampToBounds(Location location) {
+        float pitch = location.getPitch();
+        float yaw = location.getYaw();
+
+        boolean outOfBounds = false;
+        float lowerPitchBound = centerPitch + pitchBound;
+        if (pitch > lowerPitchBound) { // Should be impossible, but just check for it anyway...
+            location.setPitch(lowerPitchBound);
+            outOfBounds = true;
+        }
+        float upperPitchBound = centerPitch - pitchBound;
+        if (pitch < upperPitchBound) {
+            location.setPitch(upperPitchBound);
+            outOfBounds = true;
+        }
+        float rightBoundYaw = centerYaw + yawBound;
+        if (yaw > rightBoundYaw) {
+            location.setYaw(rightBoundYaw);
+            outOfBounds = true;
+        }
+        float leftBoundYaw = centerYaw - yawBound;
+        if (yaw < leftBoundYaw) {
+            location.setYaw(leftBoundYaw);
+            outOfBounds = true;
+        }
+        return outOfBounds;
+    }
+
     private void calculateCursorPosition(float pitch, float yaw) {
         x = (int) (yaw / (centerYaw + yawBound) * 128);
-        y = (int) (pitch - 50 / ((centerPitch + pitchBound) - 50) * 128);
+        y = (int) ((pitch - 50) / (centerPitch + pitchBound - 50) * 128);
     }
 
     private void freezePlayer(Location atLocation) {

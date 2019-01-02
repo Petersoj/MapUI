@@ -4,36 +4,12 @@ import java.awt.Color;
 
 public class MapUIColors {
 
-    public static final byte TRANSPARENT = 0;
-
-    public static final byte BLACK = matchColor(new Color(0, 0, 0));
-
-    public static final byte WHITE = matchColor(new Color(255, 255, 255));
-
-    public static final byte GRAY = matchColor(new Color(145, 145, 145));
-
-    public static final byte LIGHT_GRAY = matchColor(new Color(190, 190, 190));
-
-    public static final byte DARK_GRAY = matchColor(new Color(70, 70, 70));
-
-    public static final byte RED = matchColor(new Color(255, 0, 0));
-
-    public static final byte DARK_RED = matchColor(new Color(150, 0, 0));
-
-    public static final byte ORANGE = matchColor(new Color(216, 127, 51));
-
-    public static final byte YELLOW = matchColor(new Color(255, 255, 85));
-
-    public static final byte GREEN = matchColor(new Color(85, 230, 85));
-
-    public static final byte AQUA = matchColor(new Color(85, 255, 255));
-
-    public static final byte BLUE = matchColor(new Color(85, 85, 255));
-
-    public static final byte PURPLE = matchColor(new Color(115, 12, 115));
+    private MapUIColors() {
+    }
 
     // Colors found on https://minecraft.gamepedia.com/Map_item_format
     private static final Color[] basicMapColors = new Color[]{
+            c(0, 0, 0), // Transparent Color
             c(127, 178, 56),
             c(247, 233, 163),
             c(199, 199, 199),
@@ -87,35 +63,44 @@ public class MapUIColors {
             c(37, 22, 16)
     };
 
-    // 4 variations of 51 colors.
-    private static final MapUIColor[] allMapColors = new MapUIColor[basicMapColors.length * 4];
-
     private static Color c(int r, int g, int b) {
         return new Color(r, g, b);
     }
 
-    public static byte matchColor(int r, int g, int b) {
-        return matchColor(new Color(r, g, b));
+    private static class MapUIColor {
+
+        private final byte mapID;
+        private final Color color;
+
+        MapUIColor(byte mapID, Color color) {
+            this.mapID = mapID;
+            this.color = color;
+        }
+
+        public byte getMapID() {
+            return mapID;
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+        @Override
+        public String toString() {
+            return "MapID: " + mapID + " " + color.toString();
+        }
     }
 
-    public static byte matchColor(Color color) {
-        int smallestDifference = Integer.MAX_VALUE;
-        MapUIColor bestMatchColor = null;
-        for (MapUIColor mapUIColor : allMapColors) {
-            int difference = Math.abs(mapUIColor.getColor().getRGB() - color.getRGB());
-            if (difference < smallestDifference) {
-                bestMatchColor = mapUIColor;
-                smallestDifference = difference;
-            }
-        }
-        return bestMatchColor == null ? 0 : bestMatchColor.getMapColor();
-    }
+    // 4 variations of 51 colors. TODO remove public here
+    public static MapUIColor[] allMapColors = new MapUIColor[basicMapColors.length * 4];
 
     static {
-        for (int index = 0; index < basicMapColors.length; index++) {
-            for (int variant = 0; variant < 4; variant++) {
+        for (int index = 0; index < allMapColors.length; index += 4) {
 
-                byte newMapID = (byte) (index * 4 + variant);
+            byte baseMapIDIndex = (byte) Math.floor(index / 4f);
+
+            for (byte variant = 0; variant < 4; variant++) {
+                byte newMapID = (byte) (baseMapIDIndex * (byte) 4 + variant & 0xFF);
 
                 int rgbMultiplier;
                 if (variant == 0) {
@@ -128,7 +113,7 @@ public class MapUIColors {
                     rgbMultiplier = 135;
                 }
 
-                Color basicMapColor = basicMapColors[index];
+                Color basicMapColor = basicMapColors[baseMapIDIndex];
                 int r = basicMapColor.getRed() * rgbMultiplier / 255;
                 int g = basicMapColor.getGreen() * rgbMultiplier / 255;
                 int b = basicMapColor.getBlue() * rgbMultiplier / 255;
@@ -138,22 +123,61 @@ public class MapUIColors {
         }
     }
 
-    private static class MapUIColor {
-
-        private byte mapColor;
-        private Color color;
-
-        MapUIColor(byte mapColor, Color color) {
-            this.mapColor = mapColor;
-            this.color = color;
-        }
-
-        byte getMapColor() {
-            return mapColor;
-        }
-
-        public Color getColor() {
-            return color;
-        }
+    public static byte matchColor(int r, int g, int b) {
+        return matchColor(new Color(r, g, b));
     }
+
+    public static byte matchColor(Color color) {
+        int smallestDistance = Byte.MAX_VALUE;
+        MapUIColor bestMatchColor = null;
+
+        for (int i = 4; i < allMapColors.length; i++) {
+            MapUIColor otherMapUIColor = allMapColors[i];
+
+            Color otherMapColor = otherMapUIColor.getColor();
+
+            int distance = (int) Math.sqrt(
+                    Math.pow(otherMapColor.getRed() - color.getRed(), 2) +
+                            Math.pow(otherMapColor.getGreen() - color.getGreen(), 2) +
+                            Math.pow(otherMapColor.getBlue() - color.getBlue(), 2));
+            if (distance < smallestDistance) {
+                if (color.equals(new Color(10, 10, 10))) {
+                    System.out.println(otherMapUIColor);
+                }
+                smallestDistance = distance;
+                bestMatchColor = otherMapUIColor;
+            }
+        }
+        return bestMatchColor == null ? 0 : bestMatchColor.getMapID();
+    }
+
+    // Declaring these constants at the bottom is necessary for matchColor method to work properly.
+
+    public static byte TRANSPARENT = 0;
+
+    public static byte BLACK = matchColor(new Color(10, 10, 10));
+
+    public static byte WHITE = matchColor(new Color(255, 255, 255));
+
+    public static byte GRAY = matchColor(new Color(145, 145, 145));
+
+    public static byte LIGHT_GRAY = matchColor(new Color(190, 190, 190));
+
+    public static byte DARK_GRAY = matchColor(new Color(70, 70, 70));
+
+    public static byte RED = matchColor(new Color(255, 0, 0));
+
+    public static byte DARK_RED = matchColor(new Color(150, 0, 0));
+
+    public static byte ORANGE = matchColor(new Color(216, 127, 51));
+
+    public static byte YELLOW = matchColor(new Color(255, 255, 85));
+
+    public static byte GREEN = matchColor(new Color(85, 230, 85));
+
+    public static byte AQUA = matchColor(new Color(85, 255, 255));
+
+    public static byte BLUE = matchColor(new Color(85, 85, 255));
+
+    public static byte PURPLE = matchColor(new Color(115, 12, 115));
 }

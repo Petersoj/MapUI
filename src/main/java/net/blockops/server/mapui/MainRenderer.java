@@ -18,8 +18,8 @@ public class MainRenderer extends MapRenderer {
     @Override
     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
         MapUI mapUI = mapUIManager.getPlayerMapUIs().get(player);
-        if (mapUI != null && mapUI.isOpen()) {
-            mapUI.update(mapCanvas);
+        if (mapUI != null && mapUI.getMapCanvas() == null) {
+            mapUI.setMapCanvas(mapCanvas);
         }
     }
 }
