@@ -1,6 +1,10 @@
 package net.blockops.server.mapui.art;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 
 public class MapUIColors {
 
@@ -91,8 +95,8 @@ public class MapUIColors {
         }
     }
 
-    // 4 variations of 51 colors. TODO remove public here
-    public static MapUIColor[] allMapColors = new MapUIColor[basicMapColors.length * 4];
+    // 4 variations of 51 colors.
+    private static MapUIColor[] allMapColors = new MapUIColor[basicMapColors.length * 4];
 
     static {
         for (int index = 0; index < allMapColors.length; index += 4) {
@@ -141,14 +145,60 @@ public class MapUIColors {
                             Math.pow(otherMapColor.getGreen() - color.getGreen(), 2) +
                             Math.pow(otherMapColor.getBlue() - color.getBlue(), 2));
             if (distance < smallestDistance) {
-                if (color.equals(new Color(10, 10, 10))) {
-                    System.out.println(otherMapUIColor);
-                }
                 smallestDistance = distance;
                 bestMatchColor = otherMapUIColor;
             }
         }
         return bestMatchColor == null ? 0 : bestMatchColor.getMapID();
+    }
+
+    /**
+     * @param image           the image to resize
+     * @param resizeWidth     -1 to not resize
+     * @param resizeHeight    -1 to not resize
+     * @param isPixelArtImage use specific resizing interpolation for pixel art or regular images
+     * @return the resized image
+     */
+    public static BufferedImage resizeImage(Image image, int resizeWidth, int resizeHeight, boolean isPixelArtImage) {
+        if (resizeHeight == -1) {
+            resizeHeight = image.getHeight(null);
+        }
+        if (resizeWidth == -1) {
+            resizeWidth = image.getWidth(null);
+        }
+
+        BufferedImage bufferedImage = new BufferedImage(resizeWidth, resizeHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = bufferedImage.createGraphics();
+        if (isPixelArtImage) {
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR); // Nearest Neighbor works best with pixel art.
+        } else {
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        }
+        graphics.drawImage(image, 0, 0, resizeWidth, resizeHeight, 0, 0, image.getWidth(null), image.getHeight(null),
+                null);
+        graphics.dispose();
+
+        return bufferedImage;
+    }
+
+    /**
+     * @param image the image to convert to map colors
+     * @return a [row][col] byte array of map colors
+     */
+    public static byte[][] imageToMapColors(BufferedImage image) {
+        byte[][] mapPixels = new byte[image.getHeight()][image.getWidth()];
+
+        int[] imagePixels = new int[image.getWidth() * image.getHeight()];
+        image.getRGB(0, 0, image.getWidth(), image.getHeight(), imagePixels, 0, image.getWidth());
+
+        for (int i = 0; i < imagePixels.length; i++) {
+            mapPixels[i % mapPixels.length][i % mapPixels[0].length] = matchColor(new Color(imagePixels[i]));
+        }
+
+        return mapPixels;
     }
 
     // Declaring these constants at the bottom is necessary for matchColor method to work properly.

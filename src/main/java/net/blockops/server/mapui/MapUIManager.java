@@ -48,7 +48,7 @@ public class MapUIManager {
     public void init() {
         mapUIListeners.registerEvents();
 
-        mapView = Bukkit.getMap(emptyMapID);
+        mapView = Bukkit.getMap(emptyMapID); // Deprecated, but it shouldn't be...
         for (MapRenderer mapRenderer : mapView.getRenderers()) {
             mapView.removeRenderer(mapRenderer);
         }
@@ -59,6 +59,7 @@ public class MapUIManager {
         for (MapUI mapUI : playerMapUIs.values()) {
             if (mapUI.isOpen()) {
                 mapUI.close();
+                mapUI.deinit();
             }
         }
         playerMapUIs.clear();
@@ -121,13 +122,13 @@ public class MapUIManager {
             if (mapUI != null && mapUI.isOpen()) {
                 event.setCancelled(true); // Player can't move stuff in their inventory while MapUI open
 
-                // Close their inventory 1 tick later (to avoid any problems stated in Javadocs for this event)
+                // Close their inventory 2 ticks later (to avoid any problems stated in Javadocs for this event)
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         event.getWhoClicked().closeInventory();
                     }
-                }.runTaskLater(mapUI.getMapUIManager().getPlugin(), 1);
+                }.runTaskLater(mapUI.getMapUIManager().getPlugin(), 2);
             }
         }
     }
@@ -166,14 +167,6 @@ public class MapUIManager {
         playerMapUIs.remove(event.getPlayer());
     }
 
-    public Plugin getPlugin() {
-        return plugin;
-    }
-
-    public MapView getMapView() {
-        return mapView;
-    }
-
     public SmallMinecraftFont getSmallMinecraftFont() {
         if (smallMinecraftFont == null) {
             try {
@@ -184,6 +177,14 @@ public class MapUIManager {
             }
         }
         return smallMinecraftFont;
+    }
+
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
+    public MapView getMapView() {
+        return mapView;
     }
 
     public HashMap<Player, MapUI> getPlayerMapUIs() {

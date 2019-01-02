@@ -3,18 +3,13 @@ package net.blockops.server.mapui.component;
 import com.sun.javafx.geom.Vec2f;
 import org.bukkit.map.MapCanvas;
 
+import java.awt.Rectangle;
+
 public abstract class MapComponent {
 
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    private Rectangle componentBounds = new Rectangle(0, 0, 0, 0);
 
     public abstract void draw(MapCanvas mapCanvas);
-
-    public abstract int getWidth();
-
-    public abstract int getHeight();
 
     protected byte[][] getPixels(MapCanvas mapCanvas, int x, int y, int width, int height, byte[][] pixels) {
         if (pixels == null) {
@@ -65,15 +60,36 @@ public abstract class MapComponent {
     }
 
     public void setLocation(int x, int y) {
-        this.x = x;
-        this.y = y;
+        componentBounds.x = x;
+        componentBounds.y = y;
     }
 
     public int getX() {
-        return x;
+        return componentBounds.x;
     }
 
     public int getY() {
-        return y;
+        return componentBounds.y;
+    }
+
+    public void setSize(int width, int height) {
+        componentBounds.width = width;
+        componentBounds.height = height;
+    }
+
+    public int getWidth() {
+        return componentBounds.width;
+    }
+
+    public int getHeight() {
+        return componentBounds.height;
+    }
+
+    public void setComponentBounds(int x, int y, int width, int height) {
+        this.componentBounds.setBounds(x, y, width, height);
+    }
+
+    public Rectangle getComponentBounds() {
+        return componentBounds;
     }
 }

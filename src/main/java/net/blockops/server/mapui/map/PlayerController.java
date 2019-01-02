@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class PlayerController {
 
@@ -48,10 +49,6 @@ public class PlayerController {
         tempDataWatcher.register(baseDataWatcherObject, 0);
     }
 
-    public void deinit() {
-
-    }
-
     public void onUIOpen() {
         Location location = player.getLocation();
         this.previousLocation = location;
@@ -73,7 +70,7 @@ public class PlayerController {
         // TODO collision prevention (use either previous scoreboard or new scoreboard)
     }
 
-    public void onUIUpdate() {
+    public void update() {
         Location location = player.getLocation();
 
         // Check if player moved at all (they may have deactivated flying causing gravity to move them!)
@@ -122,15 +119,6 @@ public class PlayerController {
         this.setClientInvisible(false);
     }
 
-    public void teleportToCursorLocation(int x, int y) {
-        Validate.isTrue(x >= 0 && y >= 0 && x < 128 && y < 128);
-        // TODO teleport player to specified pitch/yaw
-
-
-        this.x = x;
-        this.y = y;
-    }
-
     private boolean clampToBounds(Location location) {
         float pitch = location.getPitch();
         float yaw = location.getYaw();
@@ -161,7 +149,22 @@ public class PlayerController {
 
     private void calculateCursorPosition(float pitch, float yaw) {
         x = (int) (yaw / (centerYaw + yawBound) * 128);
-        y = (int) ((pitch - 50) / (centerPitch + pitchBound - 50) * 128);
+        y = (int) ((pitch - 50) / (centerPitch + pitchBound - 50) * 128); // -50 because min pitch is 50
+    }
+
+    public void teleportToCursorLocation(int x, int y) {
+        Validate.isTrue(x >= 0 && y >= 0 && x < 128 && y < 128, "Out of bounds X or Y!");
+
+        Location location = player.getLocation();
+        this.clampToBounds(location); // Just in case
+
+        float pitch = ((float) (y / 128)) * (centerPitch + pitchBound - 50) + 50; // -50 because min pitch is 50
+        float yaw = ((float) (x / 128)) * (centerYaw + yawBound);
+
+        location.setPitch(pitch);
+        location.setYaw(yaw);
+
+        player.teleport(location);
     }
 
     private void freezePlayer(Location atLocation) {
@@ -173,6 +176,7 @@ public class PlayerController {
         wasFlying = player.isFlying();
         wasFlightAllowed = player.getAllowFlight();
 
+        player.setVelocity(new Vector(0, 0, 0));
         player.setFlySpeed(0f);
         player.setAllowFlight(true);
         player.setFlying(true);

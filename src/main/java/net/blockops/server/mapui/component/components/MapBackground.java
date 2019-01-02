@@ -6,28 +6,20 @@ import org.bukkit.map.MapCanvas;
 
 public class MapBackground extends MapComponent {
 
-    private byte backgroundColor = MapUIColors.TRANSPARENT;
+    private byte backgroundColor;
 
     public MapBackground() {
+        this(MapUIColors.TRANSPARENT);
     }
 
     public MapBackground(byte backgroundColor) {
         this.backgroundColor = backgroundColor;
+        super.setComponentBounds(0, 0, 128, 128);
     }
 
     @Override
     public void draw(MapCanvas mapCanvas) {
-        this.drawRectangle(mapCanvas, 0, 0, 128, 128, true, backgroundColor);
-    }
-
-    @Override
-    public int getWidth() {
-        return 128;
-    }
-
-    @Override
-    public int getHeight() {
-        return 128;
+        this.drawRectangle(mapCanvas, getX(), getY(), getWidth(), getHeight(), true, backgroundColor);
     }
 
     public byte getBackgroundColor() {

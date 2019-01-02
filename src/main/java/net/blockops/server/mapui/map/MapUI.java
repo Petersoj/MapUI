@@ -1,19 +1,13 @@
 package net.blockops.server.mapui.map;
 
 import net.blockops.server.mapui.MapUIManager;
-import net.blockops.server.mapui.component.MapComponent;
-import net.blockops.server.mapui.component.components.MapCursor;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.map.MapCanvas;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.ArrayList;
 
 public class MapUI {
 
@@ -22,11 +16,8 @@ public class MapUI {
 
     private BukkitTask updateTask;
     private PlayerController playerController;
+    private ViewController viewController;
     private MapPeripheralBlock mapPeripheralBlock;
-    private ArrayList<MapComponent> mapComponents;
-    private MapCanvas mapCanvas;
-    private boolean dirty = false;
-    private MapCursor mapCursor;
     private ItemStack mapItem;
     private boolean isOpen = false;
 
@@ -35,8 +26,8 @@ public class MapUI {
         this.player = player;
 
         this.playerController = new PlayerController(this);
+        this.viewController = new ViewController(this);
         this.mapPeripheralBlock = new MapPeripheralBlock(this);
-        this.mapComponents = new ArrayList<>();
     }
 
     public void init() {
@@ -45,7 +36,6 @@ public class MapUI {
     }
 
     public void deinit() {
-        this.playerController.deinit();
     }
 
     public void open(String mapItemName, boolean createUpdateTask) {
@@ -65,38 +55,8 @@ public class MapUI {
     public void update() {
         Validate.isTrue(isOpen, "MapUI must be open in order to update it!");
 
-        this.playerController.onUIUpdate();
-
-        // - Drawing -
-
-        if (mapCanvas == null) {
-            return;
-        }
-
-        if (playerController.didPlayerMoveCursor() && mapCursor != null) {
-            mapCursor.setLocation(playerController.getX(), playerController.getY());
-            if (!dirty) {
-                mapCursor.drawPreviousPixels(mapCanvas);
-                mapCursor.drawCurrentPixels(mapCanvas);
-            }
-        }
-
-        if (dirty) {
-            if (mapCursor != null) {
-                mapCursor.drawPreviousPixels(mapCanvas);
-            }
-            for (MapComponent mapComponent : mapComponents) {
-                if (mapComponent instanceof MapCursor) {
-                    throw new IllegalStateException("MapCursor should not be in MapUI components! Use setCursor()");
-                } else {
-                    mapComponent.draw(mapCanvas);
-                }
-            }
-            if (mapCursor != null) {
-                mapCursor.drawCurrentPixels(mapCanvas);
-            }
-            dirty = false;
-        }
+        this.playerController.update();
+        this.viewController.update();
     }
 
     public void close() {
@@ -113,19 +73,7 @@ public class MapUI {
     }
 
     public void onClick() {
-        Bukkit.broadcastMessage("Clicked!");
-    }
-
-    public void addComponent(MapComponent mapComponent) {
-        mapComponents.add(mapComponent);
-    }
-
-    public void removeComponent(MapComponent mapComponent) {
-        mapComponents.remove(mapComponent);
-    }
-
-    public void clearComponents() {
-        mapComponents.clear();
+        this.viewController.onClick();
     }
 
     private void createMapItem(String mapItemName) {
@@ -155,36 +103,12 @@ public class MapUI {
         return playerController;
     }
 
+    public ViewController getViewController() {
+        return viewController;
+    }
+
     public MapPeripheralBlock getMapPeripheralBlock() {
         return mapPeripheralBlock;
-    }
-
-    public ArrayList<MapComponent> getMapComponents() {
-        return mapComponents;
-    }
-
-    public MapCanvas getMapCanvas() {
-        return mapCanvas;
-    }
-
-    public void setMapCanvas(MapCanvas mapCanvas) {
-        this.mapCanvas = mapCanvas;
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-    }
-
-    public MapCursor getMapCursor() {
-        return mapCursor;
-    }
-
-    public void setMapCursor(MapCursor mapCursor) {
-        this.mapCursor = mapCursor;
     }
 
     public ItemStack getMapItem() {
