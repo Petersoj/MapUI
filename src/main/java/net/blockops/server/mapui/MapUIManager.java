@@ -1,6 +1,6 @@
 package net.blockops.server.mapui;
 
-import net.blockops.server.mapui.font.SmallMinecraftFont;
+import net.blockops.server.mapui.art.SmallMinecraftFont;
 import net.blockops.server.mapui.map.MapUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -42,6 +42,7 @@ public class MapUIManager {
         this.playerMapUIs = new HashMap<>();
     }
 
+    @SuppressWarnings("deprecation")
     public void init() {
         mapUIListeners.registerEvents();
 
@@ -54,9 +55,12 @@ public class MapUIManager {
 
     public void deinit() {
         for (MapUI mapUI : playerMapUIs.values()) {
-            mapUI.close();
+            if (mapUI.isOpen()) {
+                mapUI.close();
+            }
         }
         playerMapUIs.clear();
+        mapView.removeRenderer(mainRenderer);
     }
 
     // -- Event Handlers --

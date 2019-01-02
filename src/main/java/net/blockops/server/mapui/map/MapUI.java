@@ -2,14 +2,14 @@ package net.blockops.server.mapui.map;
 
 import net.blockops.server.mapui.MapUIManager;
 import net.blockops.server.mapui.component.MapComponent;
+import net.blockops.server.mapui.component.components.MapCursor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.map.MapCanvas;
 
 import java.util.ArrayList;
 
@@ -22,9 +22,9 @@ public class MapUI {
     private MapPeripheralBlock mapPeripheralBlock;
     private ArrayList<MapComponent> mapComponents;
     private boolean dirty = false;
+    private MapCursor mapCursor;
     private ItemStack mapItem;
     private boolean isOpen = false;
-    private BukkitTask updateTask;
 
     public MapUI(MapUIManager mapUIManager, Player player) {
         this.mapUIManager = mapUIManager;
@@ -44,23 +44,47 @@ public class MapUI {
         this.playerController.deinit();
     }
 
-    public void open(String mapItemName, boolean createUpdateTask) {
+    public void open(String mapItemName) {
         Validate.isTrue(!isOpen, "MapUI must be closed in order to open it!");
 
         this.createMapItem(mapItemName);
         this.playerController.onUIOpen();
         this.mapPeripheralBlock.createPeripheralBlockArmorStand();
 
-        if (createUpdateTask) {
-            this.createUpdateTask();
-        }
         this.isOpen = true;
     }
 
-    public void update(boolean forceRender) {
+    // Method should be called every tick (by MainRenderer object)
+    public void update(MapCanvas mapCanvas) {
         Validate.isTrue(isOpen, "MapUI must be open in order to update it!");
 
         this.playerController.onUIUpdate();
+
+        if (playerController.didPlayerMoveCursor() && mapCursor != null) {
+            mapCursor.setLocation(playerController.getX(), playerController.getY());
+            if (!dirty) {
+                mapCursor.drawPreviousPixels(mapCanvas);
+                mapCursor.drawCurrentPixels(mapCanvas);
+            }
+        }
+
+        if (dirty) {
+            Bukkit.broadcastMessage("Dirty Draw");
+            if (mapCursor != null) {
+                mapCursor.drawPreviousPixels(mapCanvas);
+            }
+            for (MapComponent mapComponent : mapComponents) {
+                if (mapComponent instanceof MapCursor) {
+                    throw new IllegalStateException("MapCursor should not be in MapUI components! Use setCursor()");
+                } else {
+                    mapComponent.draw(mapCanvas);
+                }
+            }
+            if (mapCursor != null) {
+                mapCursor.drawCurrentPixels(mapCanvas);
+            }
+            dirty = false;
+        }
     }
 
     public void close() {
@@ -69,9 +93,6 @@ public class MapUI {
         this.playerController.onUIClose();
         this.mapPeripheralBlock.destroyPeripheralBlockArmorStand();
 
-        if (updateTask != null) {
-            this.updateTask.cancel();
-        }
         this.isOpen = false;
     }
 
@@ -79,12 +100,16 @@ public class MapUI {
         Bukkit.broadcastMessage("Clicked!");
     }
 
-    public void addComponent() {
-
+    public void addComponent(MapComponent mapComponent) {
+        mapComponents.add(mapComponent);
     }
 
-    public void removeComponent() {
+    public void removeComponent(MapComponent mapComponent) {
+        mapComponents.remove(mapComponent);
+    }
 
+    public void clearComponents() {
+        mapComponents.clear();
     }
 
     private void createMapItem(String mapItemName) {
@@ -95,15 +120,6 @@ public class MapUI {
         mapMeta.setMapId(mapUIManager.getMapView().getId());
 
         mapItem.setItemMeta(mapMeta);
-    }
-
-    private void createUpdateTask() {
-        this.updateTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                MapUI.this.update(false);
-            }
-        }.runTaskTimer(mapUIManager.getPlugin(), 0, 0);
     }
 
     public MapUIManager getMapUIManager() {
@@ -124,6 +140,18 @@ public class MapUI {
 
     public boolean isDirty() {
         return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
+
+    public MapCursor getMapCursor() {
+        return mapCursor;
+    }
+
+    public void setMapCursor(MapCursor mapCursor) {
+        this.mapCursor = mapCursor;
     }
 
     public ItemStack getMapItem() {

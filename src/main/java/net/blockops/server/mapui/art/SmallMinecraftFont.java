@@ -1,4 +1,4 @@
-package net.blockops.server.mapui.font;
+package net.blockops.server.mapui.art;
 
 import org.bukkit.map.MapFont;
 
