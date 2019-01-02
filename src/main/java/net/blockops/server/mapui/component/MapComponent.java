@@ -1,6 +1,7 @@
 package net.blockops.server.mapui.component;
 
 import com.sun.javafx.geom.Vec2f;
+import org.apache.commons.lang.Validate;
 import org.bukkit.map.MapCanvas;
 
 import java.awt.Rectangle;
@@ -74,6 +75,25 @@ public abstract class MapComponent {
         Vec2f start = new Vec2f(x1, y1);
         Vec2f end = new Vec2f(x2, y2);
 
+    }
+
+    public void centerHorizontallyTo(int leftX, int width) {
+        Validate.isTrue(width >= getWidth(), "Width cannot be less than the text width!");
+        int halfWidth = Math.round(((float) width) / 2f);
+        int halfTextWidth = Math.round(((float) getWidth()) / 2f);
+
+        int offset = halfWidth - halfTextWidth;
+        setLocation(leftX + offset, getY());
+    }
+
+    public void centerVerticallyTo(int topY, int height) {
+        Validate.isTrue(height >= getHeight(), "Height cannot be less than the text height!");
+
+        int halfHeight = Math.round(((float) height) / 2f);
+        int halfTextHeight = Math.round(((float) getHeight()) / 2f);
+
+        int offset = halfHeight - halfTextHeight;
+        setLocation(getX(), topY + offset);
     }
 
     public void setLocation(int x, int y) {

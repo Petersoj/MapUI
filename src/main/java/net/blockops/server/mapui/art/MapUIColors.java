@@ -213,7 +213,7 @@ public class MapUIColors {
 
     public static byte LIGHT_GRAY = matchColor(new Color(190, 190, 190));
 
-    public static byte DARK_GRAY = matchColor(new Color(70, 70, 70));
+    public static byte DARK_GRAY = matchColor(new Color(40, 40, 40));
 
     public static byte RED = matchColor(new Color(255, 0, 0));
 
@@ -223,7 +223,7 @@ public class MapUIColors {
 
     public static byte YELLOW = matchColor(new Color(255, 255, 85));
 
-    public static byte GREEN = matchColor(new Color(85, 230, 85));
+    public static byte GREEN = matchColor(new Color(10, 200, 10));
 
     public static byte AQUA = matchColor(new Color(85, 255, 255));
 
