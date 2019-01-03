@@ -61,7 +61,7 @@ public class MapPeripheralBlock {
                                     EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(peripheralBlockItem));
                     ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
                 }
-            }.runTaskLater(mapUI.getMapUIManager().getPlugin(), 2);
+            }.runTaskLater(mapUI.getMapUIManager().getPlugin(), 1);
         }
     }
 

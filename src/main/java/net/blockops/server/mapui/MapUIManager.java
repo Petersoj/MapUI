@@ -66,36 +66,69 @@ public class MapUIManager {
         mapView.removeRenderer(mainRenderer);
     }
 
+    public SmallMinecraftFont getSmallMinecraftFont() {
+        if (smallMinecraftFont == null) {
+            try {
+                smallMinecraftFont = new SmallMinecraftFont();
+                smallMinecraftFont.createFont();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return smallMinecraftFont;
+    }
+
+    public void registerPlayerMapUI(Player key, MapUI value) {
+        if (playerMapUIs.containsKey(key)) {
+            throw new IllegalStateException("Cannot register an already registered MapUI!");
+        }
+        this.playerMapUIs.put(key, value);
+    }
+
     // -- Event Handlers --
 
     protected void onPlayerInteractEvent(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND) {
-            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                this.onPlayerInteract(event.getPlayer());
+        MapUI mapUI = playerMapUIs.get(event.getPlayer());
+
+        if (mapUI != null && mapUI.isOpen()) {
+            event.setCancelled(true);
+
+            if (event.getHand() == EquipmentSlot.HAND) {
+                if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                    mapUI.onClick();
+                }
             }
         }
     }
 
     protected void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND) {
-            this.onPlayerInteract(event.getPlayer());
-        }
-    }
-
-    protected void onPlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
         MapUI mapUI = playerMapUIs.get(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             event.setCancelled(true);
-            mapUI.onClick();
+
+            if (event.getHand() == EquipmentSlot.HAND) {
+                mapUI.onClick();
+            }
         }
     }
 
-    private void onPlayerInteract(Player player) {
-        MapUI mapUI = playerMapUIs.get(player);
+    protected void onPlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+        for (MapUI mapUI : playerMapUIs.values()) {
+            if (mapUI.getMapPeripheralBlock().getPeripheralBlockArmorStand().equals(event.getRightClicked())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        MapUI mapUI = playerMapUIs.get(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
-            mapUI.onClick();
+            event.setCancelled(true);
+
+            if (event.getHand() == EquipmentSlot.HAND) {
+                mapUI.onClick();
+            }
         }
     }
 
@@ -167,18 +200,6 @@ public class MapUIManager {
         playerMapUIs.remove(event.getPlayer());
     }
 
-    public SmallMinecraftFont getSmallMinecraftFont() {
-        if (smallMinecraftFont == null) {
-            try {
-                smallMinecraftFont = new SmallMinecraftFont();
-                smallMinecraftFont.createFont();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return smallMinecraftFont;
-    }
-
     public Plugin getPlugin() {
         return plugin;
     }
@@ -187,7 +208,7 @@ public class MapUIManager {
         return mapView;
     }
 
-    public HashMap<Player, MapUI> getPlayerMapUIs() {
+    protected HashMap<Player, MapUI> getPlayerMapUIs() {
         return playerMapUIs;
     }
 }

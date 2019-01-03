@@ -18,11 +18,11 @@ public class MapUIListeners implements Listener {
 
     private MapUIManager mapUIManager;
 
-    public MapUIListeners(MapUIManager mapUIManager) {
+    protected MapUIListeners(MapUIManager mapUIManager) {
         this.mapUIManager = mapUIManager;
     }
 
-    public void registerEvents() {
+    protected void registerEvents() {
         Bukkit.getPluginManager().registerEvents(this, mapUIManager.getPlugin());
     }
 

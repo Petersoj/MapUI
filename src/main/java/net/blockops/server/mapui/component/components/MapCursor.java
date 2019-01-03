@@ -11,6 +11,7 @@ public class MapCursor extends MapComponent {
     private byte[][] cursorPixels = new byte[][]{{MapUIColors.WHITE}}; // Default Single white dot cursor
     private Rectangle cursorSensitivityBounds = new Rectangle();
     private Rectangle relativeCursorSensitivityBounds = new Rectangle();
+    private boolean hidden = false;
     private byte[][] previousPixels;
     private int previousX;
     private int previousY;
@@ -87,5 +88,13 @@ public class MapCursor extends MapComponent {
 
     public byte[][] getCursorPixels() {
         return cursorPixels;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 }

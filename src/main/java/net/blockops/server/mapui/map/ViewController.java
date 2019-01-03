@@ -33,15 +33,15 @@ public class ViewController {
         }
 
         for (MapComponent mapComponent : mapComponents) {
-            mapComponent.update();
+            mapComponent.update(); // Convenience method for some MapComponents that need to update every tick
         }
 
-        if (playerController.didPlayerMoveCursor()) {
+        if (playerController.didPlayerDirectionChange()) {
             if (mapCursor != null) {
 
                 mapCursor.setLocation(playerController.getX(), playerController.getY());
 
-                if (!dirty) {
+                if (!dirty && !mapCursor.isHidden()) {
                     mapCursor.drawPreviousPixels(mapCanvas);
                     mapCursor.drawCurrentPixels(mapCanvas);
                 }
@@ -90,7 +90,7 @@ public class ViewController {
                 mapComponent.draw(mapCanvas);
             }
 
-            if (mapCursor != null) {
+            if (mapCursor != null && !mapCursor.isHidden()) {
                 mapCursor.drawCurrentPixels(mapCanvas);
             }
         }

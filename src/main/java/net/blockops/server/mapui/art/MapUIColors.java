@@ -132,6 +132,10 @@ public class MapUIColors {
     }
 
     public static byte matchColor(Color color) {
+        if (color.getAlpha() < 255) {
+            return allMapColors[0].getMapID();
+        }
+
         int smallestDistance = Byte.MAX_VALUE;
         MapUIColor bestMatchColor = null;
 
@@ -171,8 +175,9 @@ public class MapUIColors {
         Graphics2D graphics = bufferedImage.createGraphics();
         if (isPixelArtImage) {
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            // Nearest Neighbor works best with pixel art.
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR); // Nearest Neighbor works best with pixel art.
+                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         } else {
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -191,11 +196,10 @@ public class MapUIColors {
     public static byte[][] imageToMapColors(BufferedImage image) {
         byte[][] mapPixels = new byte[image.getHeight()][image.getWidth()];
 
-        int[] imagePixels = new int[image.getWidth() * image.getHeight()];
-        image.getRGB(0, 0, image.getWidth(), image.getHeight(), imagePixels, 0, image.getWidth());
-
-        for (int i = 0; i < imagePixels.length; i++) {
-            mapPixels[i % mapPixels.length][i % mapPixels[0].length] = matchColor(new Color(imagePixels[i]));
+        for (int row = 0; row < image.getHeight(); row++) {
+            for (int col = 0; col < image.getWidth(); col++) {
+                mapPixels[row][col] = matchColor(new Color(image.getRGB(col, row), true));
+            }
         }
 
         return mapPixels;

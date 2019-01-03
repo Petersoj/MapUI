@@ -5,10 +5,13 @@ import net.minecraft.server.v1_13_R2.DataWatcherObject;
 import net.minecraft.server.v1_13_R2.DataWatcherRegistry;
 import net.minecraft.server.v1_13_R2.PacketPlayOutEntityMetadata;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class PlayerController {
@@ -30,23 +33,25 @@ public class PlayerController {
     private final float defaultFlySpeed = 0.1f;
     private float previousFlySpeed = defaultFlySpeed;
     private int playerMoveIssueCount;
-    private boolean playerMovedCursor;
+    private boolean playerDirectionChanged;
     private int x;
     private int y;
     private static DataWatcherObject<Byte> baseDataWatcherObject = new DataWatcherObject<>(0, DataWatcherRegistry.a);
-    private DataWatcher tempDataWatcher;
+    private DataWatcher temporaryDataWatcher;
     private DataWatcher entityPlayerDataWatcher;
+    private Scoreboard collisionScoreboard;
+    private Team collisionRuleTeam;
 
     public PlayerController(MapUI mapUI) {
         this.mapUI = mapUI;
         this.player = mapUI.getPlayer();
 
-        this.tempDataWatcher = new DataWatcher(((CraftPlayer) player).getHandle());
+        this.temporaryDataWatcher = new DataWatcher(((CraftPlayer) player).getHandle());
         this.entityPlayerDataWatcher = ((CraftPlayer) player).getHandle().getDataWatcher();
     }
 
     public void init() {
-        tempDataWatcher.register(baseDataWatcherObject, 0);
+        temporaryDataWatcher.register(baseDataWatcherObject, 0);
     }
 
     public void onUIOpen() {
@@ -57,8 +62,11 @@ public class PlayerController {
         cursorCenterLocation.setYaw(centerYaw);
         cursorCenterLocation.setPitch(centerPitch);
         this.freezePlayer(cursorCenterLocation);
+
         this.calculateCursorPosition(cursorCenterLocation.getPitch(), cursorCenterLocation.getYaw());
-        playerMovedCursor = true;
+        playerDirectionChanged = true;
+
+        this.setClientCollidable(false);
 
         initialMainHandItemStack = player.getInventory().getItemInMainHand();
         initialOffHandItemStack = player.getInventory().getItemInOffHand();
@@ -66,8 +74,6 @@ public class PlayerController {
         player.getInventory().setItemInOffHand(null);
 
         this.setClientInvisible(true);
-
-        // TODO collision prevention (use either previous scoreboard or new scoreboard)
     }
 
     public void update() {
@@ -99,11 +105,11 @@ public class PlayerController {
         }
 
         if (!outOfBounds) {
-            playerMovedCursor = pitch != lastPitch || yaw != lastYaw;
+            playerDirectionChanged = pitch != lastPitch || yaw != lastYaw;
             lastPitch = pitch;
             lastYaw = yaw;
 
-            if (playerMovedCursor) {
+            if (playerDirectionChanged) {
                 this.calculateCursorPosition(pitch, yaw);
             }
         }
@@ -112,6 +118,8 @@ public class PlayerController {
     public void onUIClose() {
         this.unFreezePlayer();
         player.teleport(previousLocation);
+
+        this.setClientCollidable(true);
 
         player.getInventory().setItemInMainHand(initialMainHandItemStack);
         player.getInventory().setItemInOffHand(initialOffHandItemStack);
@@ -195,17 +203,47 @@ public class PlayerController {
     private void setClientInvisible(boolean invisible) {
         byte previousData = entityPlayerDataWatcher.get(baseDataWatcherObject);
         if (invisible) {
-            tempDataWatcher.set(baseDataWatcherObject, (byte) (previousData | 0b0010_0000));
+            temporaryDataWatcher.set(baseDataWatcherObject, (byte) (previousData | 0b0010_0000));
         } else {
-            tempDataWatcher.set(baseDataWatcherObject, (byte) (previousData & ~0b0010_0000));
+            temporaryDataWatcher.set(baseDataWatcherObject, (byte) (previousData & ~0b0010_0000));
         }
         PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(player.getEntityId(),
-                tempDataWatcher, true);
+                temporaryDataWatcher, true);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityMetadataPacket);
     }
 
-    public boolean didPlayerMoveCursor() {
-        return playerMovedCursor;
+    private void setClientCollidable(boolean collidable) {
+        if (collisionScoreboard == null) { // First time run
+            collisionScoreboard = player.getScoreboard();
+            if (collisionScoreboard == null) {
+                collisionScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+                player.setScoreboard(collisionScoreboard);
+            } else { // Player already has a scoreboard
+                for (Team team : collisionScoreboard.getTeams()) {
+                    if (team.getOption(Team.Option.COLLISION_RULE) == Team.OptionStatus.NEVER) {
+                        return; // Collision rule never has already been set by something else so don't mess with it
+                    }
+                }
+            }
+        }
+        if (collisionRuleTeam == null) {
+            String collisionTeamName = "no_collision";
+            collisionRuleTeam = collisionScoreboard.getTeam(collisionTeamName);
+            if (collisionRuleTeam == null) {
+                collisionRuleTeam = collisionScoreboard.registerNewTeam(collisionTeamName);
+            }
+        }
+
+        // Set collision rule no matter what because collision rule has not been set by another scoreboard/plugin
+        if (collidable) {
+            collisionRuleTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.ALWAYS);
+        } else {
+            collisionRuleTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        }
+    }
+
+    public boolean didPlayerDirectionChange() {
+        return playerDirectionChanged;
     }
 
     public Location getCursorCenterLocation() {

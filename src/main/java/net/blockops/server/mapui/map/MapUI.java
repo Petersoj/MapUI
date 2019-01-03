@@ -31,7 +31,7 @@ public class MapUI {
     }
 
     public void init() {
-        mapUIManager.getPlayerMapUIs().put(player, this);
+        this.mapUIManager.registerPlayerMapUI(player, this);
         this.playerController.init();
     }
 
