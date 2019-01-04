@@ -115,7 +115,8 @@ public class MapUIManager {
 
     protected void onPlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
         for (MapUI mapUI : playerMapUIs.values()) {
-            if (mapUI.getMapPeripheralBlock().getPeripheralBlockArmorStand().equals(event.getRightClicked())) {
+            if (mapUI.getMapPeripheralBlock().getPeripheralBlockArmorStand().equals(event.getRightClicked())
+                    && mapUI.getPlayer() != event.getPlayer()) {
                 event.setCancelled(true);
                 return;
             }

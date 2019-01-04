@@ -38,7 +38,7 @@ public class MapUI {
     public void deinit() {
     }
 
-    public void open(String mapItemName, boolean createUpdateTask) {
+    public void open(String mapItemName, boolean createUpdateTask, int motionlessCloseTicks) {
         Validate.isTrue(!isOpen, "MapUI must be closed in order to open it!");
 
         this.createMapItem(mapItemName);
@@ -46,7 +46,7 @@ public class MapUI {
         this.mapPeripheralBlock.createPeripheralBlockArmorStand();
 
         if (createUpdateTask) {
-            this.createUpdateTask();
+            this.createUpdateTask(motionlessCloseTicks);
         }
 
         this.isOpen = true;
@@ -86,11 +86,23 @@ public class MapUI {
         mapItem.setItemMeta(mapMeta);
     }
 
-    private void createUpdateTask() {
+    private void createUpdateTask(int motionlessCloseTicks) {
         updateTask = new BukkitRunnable() {
+            int motionlessCount = 0;
+            boolean checkMotionless = motionlessCloseTicks > 0;
+
             @Override
             public void run() {
                 MapUI.this.update();
+
+                if (checkMotionless) {
+                    if (!playerController.didPlayerDirectionChange()) {
+                        motionlessCount++;
+                    }
+                    if (motionlessCount >= motionlessCloseTicks) {
+                        MapUI.this.close();
+                    }
+                }
             }
         }.runTaskTimer(mapUIManager.getPlugin(), 0, 0);
     }
