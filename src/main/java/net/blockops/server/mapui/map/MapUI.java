@@ -36,6 +36,10 @@ public class MapUI {
     }
 
     public void deinit() {
+        if (isOpen) {
+            this.close();
+        }
+        mapUIManager.deregisterPlayerMapUI(player);
     }
 
     public void open(String mapItemName, boolean createUpdateTask, int motionlessCloseTicks) {

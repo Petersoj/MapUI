@@ -11,6 +11,11 @@ public class MapImage extends MapComponent {
     private BufferedImage image;
     private byte[][] buffer;
 
+    public MapImage(byte[][] imageMapColors, int x, int y) {
+        this.buffer = imageMapColors;
+        super.setComponentBounds(x, y, imageMapColors[0].length, imageMapColors.length);
+    }
+
     public MapImage(BufferedImage image, int x, int y) {
         this.image = image;
         super.setComponentBounds(x, y, image.getWidth(), image.getHeight());

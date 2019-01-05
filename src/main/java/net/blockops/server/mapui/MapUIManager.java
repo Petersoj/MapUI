@@ -16,7 +16,7 @@ public class MapUIManager {
     private short emptyMapID;
     private MapView mapView;
 
-    private SmallMinecraftFont smallMinecraftFont;
+    private static SmallMinecraftFont smallMinecraftFont;
     private MapUIEventListener mapUIEventListener;
     private MapUIEventHandlers mapUIEventHandlers;
     private MainRenderer mainRenderer;
@@ -68,9 +68,13 @@ public class MapUIManager {
 
     public void registerPlayerMapUI(Player key, MapUI value) {
         if (playerMapUIs.containsKey(key)) {
-            throw new IllegalStateException("Cannot register an already registered MapUI!");
+            throw new IllegalStateException("Cannot register an already initialized MapUI!");
         }
         this.playerMapUIs.put(key, value);
+    }
+
+    public void deregisterPlayerMapUI(Player key) {
+        this.playerMapUIs.remove(key);
     }
 
     public MapUIEventHandlers getMapUIEventHandlers() {
