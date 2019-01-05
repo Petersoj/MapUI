@@ -14,12 +14,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-public class MapUIListeners implements Listener {
+public class MapUIEventListener implements Listener {
 
     private MapUIManager mapUIManager;
+    private MapUIEventHandlers mapUIEventHandlers;
 
-    protected MapUIListeners(MapUIManager mapUIManager) {
+    protected MapUIEventListener(MapUIManager mapUIManager) {
         this.mapUIManager = mapUIManager;
+        this.mapUIEventHandlers = mapUIManager.getMapUIEventHandlers();
     }
 
     protected void registerEvents() {
@@ -28,51 +30,51 @@ public class MapUIListeners implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        this.mapUIManager.onPlayerInteractEvent(event);
+        this.mapUIEventHandlers.onPlayerInteractEvent(event);
     }
 
     @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-        this.mapUIManager.onPlayerInteractEntityEvent(event);
+        this.mapUIEventHandlers.onPlayerInteractEntityEvent(event);
     }
 
     @EventHandler
     public void onPlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
-        this.mapUIManager.onPlayerArmorStandManipulateEvent(event);
+        this.mapUIEventHandlers.onPlayerArmorStandManipulateEvent(event);
     }
 
     @EventHandler
     public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
-        this.mapUIManager.onPlayerToggleSneakEvent(event);
+        this.mapUIEventHandlers.onPlayerToggleSneakEvent(event);
     }
 
     @EventHandler
     public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
-        this.mapUIManager.onPlayerItemHeldEvent(event);
+        this.mapUIEventHandlers.onPlayerItemHeldEvent(event);
     }
 
     @EventHandler
     protected void onInventoryClickEvent(InventoryClickEvent event) {
-        this.mapUIManager.onInventoryClickEvent(event);
+        this.mapUIEventHandlers.onInventoryClickEvent(event);
     }
 
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
-        this.mapUIManager.onPlayerDropItemEvent(event);
+        this.mapUIEventHandlers.onPlayerDropItemEvent(event);
     }
 
     @EventHandler
     public void onPlayerSwapItemEvent(PlayerSwapHandItemsEvent event) {
-        this.mapUIManager.onPlayerSwapItemEvent(event);
+        this.mapUIEventHandlers.onPlayerSwapItemEvent(event);
     }
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        this.mapUIManager.onPlayerQuitEvent(event);
+        this.mapUIEventHandlers.onPlayerQuitEvent(event);
     }
 
     @EventHandler
     public void onPlayerKickEvent(PlayerKickEvent event) {
-        this.mapUIManager.onPlayerKickEvent(event);
+        this.mapUIEventHandlers.onPlayerKickEvent(event);
     }
 }
