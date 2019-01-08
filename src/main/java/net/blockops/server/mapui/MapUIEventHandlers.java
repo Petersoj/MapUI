@@ -3,6 +3,7 @@ package net.blockops.server.mapui;
 import net.blockops.server.mapui.map.MapUI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -67,6 +68,17 @@ public class MapUIEventHandlers {
 
             if (event.getHand() == EquipmentSlot.HAND) {
                 mapUI.onClick();
+            }
+        }
+    }
+
+    protected void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player) {
+
+            MapUI mapUI = getPlayerMapUI((Player) event.getDamager());
+
+            if (mapUI != null && mapUI.isOpen()) {
+                event.setCancelled(true);
             }
         }
     }

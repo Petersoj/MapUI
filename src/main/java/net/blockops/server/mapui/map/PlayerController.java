@@ -51,7 +51,7 @@ public class PlayerController {
     }
 
     public void init() {
-        temporaryDataWatcher.register(baseDataWatcherObject, 0);
+        temporaryDataWatcher.register(baseDataWatcherObject, (byte) 0);
     }
 
     public void onUIOpen() {
@@ -202,11 +202,15 @@ public class PlayerController {
 
     private void setClientInvisible(boolean invisible) {
         byte previousData = entityPlayerDataWatcher.get(baseDataWatcherObject);
+        byte newData;
+
         if (invisible) {
-            temporaryDataWatcher.set(baseDataWatcherObject, (byte) (previousData | 0b0010_0000));
+            newData = (byte) (previousData | 0b0010_0000);
         } else {
-            temporaryDataWatcher.set(baseDataWatcherObject, (byte) (previousData & ~0b0010_0000));
+            newData = (byte) (previousData & ~0b0010_0000);
         }
+        temporaryDataWatcher.set(baseDataWatcherObject, newData);
+
         PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(player.getEntityId(),
                 temporaryDataWatcher, true);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityMetadataPacket);

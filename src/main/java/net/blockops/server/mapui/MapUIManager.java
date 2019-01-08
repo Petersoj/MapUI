@@ -77,6 +77,14 @@ public class MapUIManager {
         this.playerMapUIs.remove(key);
     }
 
+    public boolean isPlayerMapUIRegistered(MapUI mapUI) {
+        return playerMapUIs.containsValue(mapUI);
+    }
+
+    public boolean isMapUIPlayerRegistered(Player player) {
+        return playerMapUIs.containsKey(player);
+    }
+
     public MapUIEventHandlers getMapUIEventHandlers() {
         return mapUIEventHandlers;
     }

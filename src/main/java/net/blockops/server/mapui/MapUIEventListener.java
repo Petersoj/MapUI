@@ -3,6 +3,7 @@ package net.blockops.server.mapui;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -41,6 +42,11 @@ public class MapUIEventListener implements Listener {
     @EventHandler
     public void onPlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
         this.mapUIEventHandlers.onPlayerArmorStandManipulateEvent(event);
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        this.mapUIEventHandlers.onEntityDamageByEntityEvent(event);
     }
 
     @EventHandler
