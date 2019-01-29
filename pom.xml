@@ -8,6 +8,10 @@
     <artifactId>mapui</artifactId>
     <version>1.0-MC-1.13.2</version>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
