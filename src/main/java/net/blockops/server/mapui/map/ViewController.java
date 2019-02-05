@@ -59,7 +59,7 @@ public class ViewController {
                         } else {
                             if (mapButton.isHovered()) {
                                 mapButton.setHovered(false);
-                                mapButton.onHoverExit(mapCursor);
+                                mapButton.onHoverExit(mapUI, mapCursor);
                                 this.dirty = true;
                             }
                         }
@@ -67,7 +67,7 @@ public class ViewController {
                 }
                 if (topMostHoveredButton != null && !topMostHoveredButton.isHovered()) {
                     topMostHoveredButton.setHovered(true);
-                    topMostHoveredButton.onHoverEnter(mapCursor);
+                    topMostHoveredButton.onHoverEnter(mapUI, mapCursor);
                     this.dirty = true;
                 }
             }
@@ -106,7 +106,7 @@ public class ViewController {
 
                 if (mapButton.isHovered()) { // Only one button is allowed to be hovered over at a time
                     mapButton.setClicked(true);
-                    mapButton.onClick(mapCursor);
+                    mapButton.onClick(mapUI, mapCursor);
                     this.dirty = true;
                     break;
                 }

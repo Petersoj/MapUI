@@ -1,28 +1,22 @@
 package net.blockops.server.mapui.component.components;
 
 import net.blockops.server.mapui.component.MapComponent;
+import net.blockops.server.mapui.map.MapUI;
 
 import java.awt.Rectangle;
 
 public abstract class MapButton extends MapComponent {
 
-    private MapText mapText;
     private Rectangle clickBounds;
     private boolean hovered;
     private boolean clicked;
 
     public MapButton(Rectangle bounds) {
-        this(null, bounds.x, bounds.y, bounds.width, bounds.height);
+        this(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
-    public MapButton(MapText mapText, Rectangle bounds) {
-        this(mapText, bounds.x, bounds.y, bounds.width, bounds.height);
-    }
-
-    public MapButton(MapText mapText, int x, int y, int width, int height) {
-        this.mapText = mapText;
+    public MapButton(int x, int y, int width, int height) {
         super.setComponentBounds(x, y, width, height);
-
         this.clickBounds = new Rectangle(getComponentBounds());
     }
 
@@ -35,24 +29,16 @@ public abstract class MapButton extends MapComponent {
         }
     }
 
-    public void onClick(MapCursor mapCursor) {
+    public void onClick(MapUI mapUI, MapCursor mapCursor) {
 
     }
 
-    public void onHoverEnter(MapCursor mapCursor) {
+    public void onHoverEnter(MapUI mapUI, MapCursor mapCursor) {
 
     }
 
-    public void onHoverExit(MapCursor mapCursor) {
+    public void onHoverExit(MapUI mapUI, MapCursor mapCursor) {
 
-    }
-
-    public MapText getMapText() {
-        return mapText;
-    }
-
-    public void setMapText(MapText mapText) {
-        this.mapText = mapText;
     }
 
     public boolean isHovered() {

@@ -30,8 +30,10 @@ public class MapUI {
         this.mapPeripheralBlock = new MapPeripheralBlock(this);
     }
 
-    public void init() {
-        this.mapUIManager.registerPlayerMapUI(player, this);
+    public void init(boolean doRegisterMap) {
+        if (doRegisterMap) {
+            this.mapUIManager.registerPlayerMapUI(player, this);
+        }
         this.playerController.init();
     }
 

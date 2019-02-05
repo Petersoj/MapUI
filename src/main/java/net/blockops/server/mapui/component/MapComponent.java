@@ -1,7 +1,6 @@
 package net.blockops.server.mapui.component;
 
 import com.sun.javafx.geom.Vec2f;
-import org.apache.commons.lang.Validate;
 import org.bukkit.map.MapCanvas;
 
 import java.awt.Rectangle;
@@ -68,6 +67,7 @@ public abstract class MapComponent {
 
     protected void drawElipse(MapCanvas mapCanvas, int x, int y, int width, int height, boolean fill, byte color) {
         // TODO drawElipse
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     protected void drawLine(MapCanvas mapCanvas, int x1, int y1, int x2, int y2, int thickness, byte color) {
@@ -75,24 +75,22 @@ public abstract class MapComponent {
         Vec2f start = new Vec2f(x1, y1);
         Vec2f end = new Vec2f(x2, y2);
 
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     public void centerHorizontallyTo(int leftX, int width) {
-        Validate.isTrue(width >= getWidth(), "Width cannot be less than the text width!");
         int halfWidth = Math.round(((float) width) / 2f);
-        int halfTextWidth = Math.round(((float) getWidth()) / 2f);
+        int halfComponentWidth = Math.round(((float) getWidth() / 2f));
 
-        int offset = halfWidth - halfTextWidth;
+        int offset = halfWidth - halfComponentWidth;
         setLocation(leftX + offset, getY());
     }
 
     public void centerVerticallyTo(int topY, int height) {
-        Validate.isTrue(height >= getHeight(), "Height cannot be less than the text height!");
-
         int halfHeight = Math.round(((float) height) / 2f);
-        int halfTextHeight = Math.round(((float) getHeight()) / 2f);
+        int halfComponentHeight = Math.round(((float) getHeight() / 2f));
 
-        int offset = halfHeight - halfTextHeight;
+        int offset = halfHeight - halfComponentHeight;
         setLocation(getX(), topY + offset);
     }
 
