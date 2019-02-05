@@ -118,6 +118,7 @@ public class PlayerController {
     public void onUIClose() {
         this.unFreezePlayer();
         player.teleport(previousLocation);
+        playerMoveIssueCount = 0;
 
         this.setClientCollidable(true);
 
@@ -231,7 +232,7 @@ public class PlayerController {
             }
         }
         if (collisionRuleTeam == null) {
-            String collisionTeamName = "no_collision";
+            final String collisionTeamName = "no_collision";
             collisionRuleTeam = collisionScoreboard.getTeam(collisionTeamName);
             if (collisionRuleTeam == null) {
                 collisionRuleTeam = collisionScoreboard.registerNewTeam(collisionTeamName);
