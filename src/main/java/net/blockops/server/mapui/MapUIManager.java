@@ -85,6 +85,10 @@ public class MapUIManager {
         return playerMapUIs.containsKey(player);
     }
 
+    public MapUI getMapUIFromRegisteredPlayer(Player player) {
+        return playerMapUIs.get(player);
+    }
+
     public MapUIEventHandlers getMapUIEventHandlers() {
         return mapUIEventHandlers;
     }

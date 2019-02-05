@@ -15,8 +15,10 @@ public class MainRenderer extends MapRenderer {
         this.mapUIManager = mapUIManager;
     }
 
+    // This renderer is only meant to give MapUI a per-player MapCanvas reference.
     @Override
     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+        // TODO create a way that only gets a MapUI if there was a new one registered (inefficient to always call .get)
         MapUI mapUI = mapUIManager.getPlayerMapUIs().get(player);
         if (mapUI != null && mapUI.getViewController().getMapCanvas() == null) {
             mapUI.getViewController().setMapCanvas(mapCanvas);
