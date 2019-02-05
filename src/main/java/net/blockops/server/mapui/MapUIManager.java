@@ -9,6 +9,7 @@ import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class MapUIManager {
 
@@ -37,6 +38,10 @@ public class MapUIManager {
         mapUIEventListener.registerEvents();
 
         mapView = Bukkit.getMap(emptyMapID); // Deprecated, but it shouldn't be...
+        if (mapView == null) {
+            throw new NoSuchElementException("Map ID: " + emptyMapID +
+                    " does not exist! Create a map first and then pass a valid Map ID please!");
+        }
         for (MapRenderer mapRenderer : mapView.getRenderers()) {
             mapView.removeRenderer(mapRenderer);
         }
@@ -51,7 +56,9 @@ public class MapUIManager {
             }
         }
         playerMapUIs.clear();
-        mapView.removeRenderer(mainRenderer);
+        if (mapView != null) {
+            mapView.removeRenderer(mainRenderer);
+        }
     }
 
     public SmallMinecraftFont getSmallMinecraftFont() {
@@ -77,16 +84,16 @@ public class MapUIManager {
         this.playerMapUIs.remove(key);
     }
 
+    public MapUI getMapUIFromRegisteredPlayer(Player player) {
+        return playerMapUIs.get(player);
+    }
+
     public boolean isPlayerMapUIRegistered(MapUI mapUI) {
         return playerMapUIs.containsValue(mapUI);
     }
 
     public boolean isMapUIPlayerRegistered(Player player) {
         return playerMapUIs.containsKey(player);
-    }
-
-    public MapUI getMapUIFromRegisteredPlayer(Player player) {
-        return playerMapUIs.get(player);
     }
 
     public MapUIEventHandlers getMapUIEventHandlers() {

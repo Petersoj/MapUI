@@ -91,7 +91,7 @@ public class PlayerController {
         }
 
         // This ensures that the player is not involuntarily being moved indefinitely
-        if (playerMoveIssueCount > 5) {
+        if (playerMoveIssueCount >= 5) {
             mapUI.close();
             return;
         }
