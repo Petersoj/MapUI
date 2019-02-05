@@ -102,7 +102,10 @@ public class MapUI {
                 if (checkMotionless) {
                     if (!playerController.didPlayerDirectionChange()) {
                         motionlessCount++;
+                    } else {
+                        motionlessCount = 0;
                     }
+
                     if (motionlessCount >= motionlessCloseTicks) {
                         MapUI.this.close();
                     }
