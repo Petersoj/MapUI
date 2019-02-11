@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 
 public class MapImage extends MapComponent {
 
-    private BufferedImage image;
     private byte[][] buffer;
 
     public MapImage(byte[][] imageMapColors, int x, int y) {
@@ -17,19 +16,14 @@ public class MapImage extends MapComponent {
     }
 
     public MapImage(BufferedImage image, int x, int y) {
-        this.image = image;
+        this.buffer = MapUIColors.imageToMapColors(image);
         super.setComponentBounds(x, y, image.getWidth(), image.getHeight());
     }
 
     @Override
     public void draw(MapCanvas mapCanvas) {
-        if (buffer == null) {
-            this.convertImageToMapColors();
+        if (buffer != null) {
+            super.drawPixels(mapCanvas, getX(), getY(), buffer, false);
         }
-        super.drawPixels(mapCanvas, getX(), getY(), buffer, false);
-    }
-
-    private void convertImageToMapColors() {
-        this.buffer = MapUIColors.imageToMapColors(image);
     }
 }

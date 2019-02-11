@@ -34,8 +34,8 @@ public class PlayerController {
     private float previousFlySpeed = defaultFlySpeed;
     private int playerMoveIssueCount;
     private boolean playerDirectionChanged;
-    private int x;
-    private int y;
+    private int cursorX;
+    private int cursorY;
     private static DataWatcherObject<Byte> baseDataWatcherObject = new DataWatcherObject<>(0, DataWatcherRegistry.a);
     private DataWatcher temporaryDataWatcher;
     private DataWatcher entityPlayerDataWatcher;
@@ -157,8 +157,8 @@ public class PlayerController {
     }
 
     private void calculateCursorPosition(float pitch, float yaw) {
-        x = (int) (yaw / (centerYaw + yawBound) * 128);
-        y = (int) ((pitch - 50) / (centerPitch + pitchBound - 50) * 128); // -50 because min pitch is 50
+        cursorX = (int) (yaw / (centerYaw + yawBound) * 128);
+        cursorY = (int) ((pitch - 50) / (centerPitch + pitchBound - 50) * 128); // -50 because min pitch is 50
     }
 
     public void teleportToCursorLocation(int x, int y) {
@@ -255,11 +255,11 @@ public class PlayerController {
         return cursorCenterLocation;
     }
 
-    public int getX() {
-        return x;
+    public int getCursorX() {
+        return cursorX;
     }
 
-    public int getY() {
-        return y;
+    public int getCursorY() {
+        return cursorY;
     }
 }

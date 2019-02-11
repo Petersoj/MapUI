@@ -39,7 +39,7 @@ public class ViewController {
         if (playerController.didPlayerDirectionChange()) {
             if (mapCursor != null) {
 
-                mapCursor.setLocation(playerController.getX(), playerController.getY());
+                mapCursor.setLocation(playerController.getCursorX(), playerController.getCursorY());
 
                 if (!dirty && !mapCursor.isHidden()) {
                     mapCursor.drawPreviousPixels(mapCanvas);
