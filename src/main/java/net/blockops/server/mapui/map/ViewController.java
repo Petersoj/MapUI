@@ -2,6 +2,7 @@ package net.blockops.server.mapui.map;
 
 import net.blockops.server.mapui.art.MapUIColors;
 import net.blockops.server.mapui.component.MapComponent;
+import net.blockops.server.mapui.component.MapPanel;
 import net.blockops.server.mapui.component.components.MapBackground;
 import net.blockops.server.mapui.component.components.MapButton;
 import net.blockops.server.mapui.component.components.MapCursor;
@@ -60,7 +61,7 @@ public class ViewController {
                             if (mapButton.isHovered()) {
                                 mapButton.setHovered(false);
                                 mapButton.onHoverExit(mapUI, mapCursor);
-                                this.dirty = true;
+                                dirty = true;
                             }
                         }
                     }
@@ -68,7 +69,7 @@ public class ViewController {
                 if (topMostHoveredButton != null && !topMostHoveredButton.isHovered()) {
                     topMostHoveredButton.setHovered(true);
                     topMostHoveredButton.onHoverEnter(mapUI, mapCursor);
-                    this.dirty = true;
+                    dirty = true;
                 }
             }
         }
@@ -107,11 +108,17 @@ public class ViewController {
                 if (mapButton.isHovered()) { // Only one button is allowed to be hovered over at a time
                     mapButton.setClicked(true);
                     mapButton.onClick(mapUI, mapCursor);
-                    this.dirty = true;
+                    dirty = true;
                     break;
                 }
             }
         }
+    }
+
+    public void setMapPanel(MapPanel mapPanel) {
+        mapComponents.clear();
+        mapComponents.addAll(mapPanel.getMapComponents());
+        dirty = true;
     }
 
     public void addComponent(MapComponent mapComponent) {
