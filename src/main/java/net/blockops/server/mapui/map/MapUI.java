@@ -48,8 +48,10 @@ public class MapUI {
         Validate.isTrue(!isOpen, "MapUI must be closed in order to open it!");
 
         this.createMapItem(mapItemName);
-        this.playerController.onUIOpen();
+
+        this.playerController.configureLocations(player.getLocation());
         this.mapPeripheralBlock.createPeripheralBlockArmorStand();
+        this.playerController.onUIOpen();
 
         if (createUpdateTask) {
             this.createUpdateTask(motionlessCloseTicks);

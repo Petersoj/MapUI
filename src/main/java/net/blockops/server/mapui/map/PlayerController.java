@@ -18,6 +18,7 @@ public class PlayerController {
 
     private MapUI mapUI;
     private Player player;
+
     private final float centerPitch = 70f;
     private final float centerYaw = 40f;
     private final float pitchBound = 20f;
@@ -32,6 +33,7 @@ public class PlayerController {
     private boolean wasFlying;
     private final float defaultFlySpeed = 0.1f;
     private float previousFlySpeed = defaultFlySpeed;
+    private Vector previousVelocityVector;
     private int playerMoveIssueCount;
     private boolean playerDirectionChanged;
     private int cursorX;
@@ -55,45 +57,41 @@ public class PlayerController {
     }
 
     public void onUIOpen() {
-        Location location = player.getLocation();
-        this.previousLocation = location;
-
-        cursorCenterLocation = location.clone();
-        cursorCenterLocation.setYaw(centerYaw);
-        cursorCenterLocation.setPitch(centerPitch);
-        this.freezePlayer(cursorCenterLocation);
-
-        this.calculateCursorPosition(cursorCenterLocation.getPitch(), cursorCenterLocation.getYaw());
-        playerDirectionChanged = true;
-
-        this.setClientCollidable(false);
-
         initialMainHandItemStack = player.getInventory().getItemInMainHand();
         initialOffHandItemStack = player.getInventory().getItemInOffHand();
         player.getInventory().setItemInMainHand(mapUI.getMapItem());
         player.getInventory().setItemInOffHand(null);
 
+        if (cursorCenterLocation == null || previousLocation == null) {
+            this.configureLocations(player.getLocation());
+        }
+        this.freezePlayer(cursorCenterLocation);
+        this.setClientCollidable(false);
         this.setClientInvisible(true);
+        playerDirectionChanged = true;
+
+        this.calculateCursorPosition(cursorCenterLocation.getPitch(), cursorCenterLocation.getYaw());
     }
 
-    public void update() {
+    protected void update() {
         Location location = player.getLocation();
 
         // Check if player moved at all (they may have deactivated flying causing gravity to move them!)
         if (location.getX() != cursorCenterLocation.getX() || location.getY() != cursorCenterLocation.getY()
                 || location.getZ() != cursorCenterLocation.getZ() || !player.isFlying()) {
+
             this.unFreezePlayer(); // reset flying speeds and such
             this.freezePlayer(cursorCenterLocation); // reset player location and flying speed/flying
 
             if (player.isFlying()) { // Player was flying and therefore must have been a world movement issue
                 playerMoveIssueCount++;
-            }
-        }
 
-        // This ensures that the player is not involuntarily being moved indefinitely
-        if (playerMoveIssueCount >= 5) {
-            mapUI.close();
-            return;
+                // This ensures that the player is not involuntarily being moved indefinitely
+                if (playerMoveIssueCount >= 5) {
+                    mapUI.close();
+                    return;
+                }
+            }
         }
 
         float pitch = location.getPitch();
@@ -126,6 +124,14 @@ public class PlayerController {
         player.getInventory().setItemInOffHand(initialOffHandItemStack);
 
         this.setClientInvisible(false);
+    }
+
+    public void configureLocations(Location playerLocation) {
+        previousLocation = playerLocation;
+
+        cursorCenterLocation = playerLocation.clone();
+        cursorCenterLocation.setYaw(centerYaw);
+        cursorCenterLocation.setPitch(centerPitch);
     }
 
     private boolean clampToBounds(Location location) {
@@ -185,6 +191,8 @@ public class PlayerController {
         wasFlying = player.isFlying();
         wasFlightAllowed = player.getAllowFlight();
 
+        previousVelocityVector = player.getVelocity();
+
         player.setVelocity(new Vector(0, 0, 0));
         player.setFlySpeed(0f);
         player.setAllowFlight(true);
@@ -199,6 +207,7 @@ public class PlayerController {
         player.setFlySpeed(previousFlySpeed);
         player.setFlying(wasFlying);
         player.setAllowFlight(wasFlightAllowed);
+        player.setVelocity(previousVelocityVector);
     }
 
     private void setClientInvisible(boolean invisible) {

@@ -28,7 +28,7 @@ public class ViewController {
         this.mapComponents = new ArrayList<>();
     }
 
-    public void update() {
+    protected void update() {
         if (mapCanvas == null) {
             return;
         }
