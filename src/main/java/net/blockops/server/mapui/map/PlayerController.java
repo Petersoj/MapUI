@@ -1,5 +1,6 @@
 package net.blockops.server.mapui.map;
 
+import net.blockops.server.mapui.util.Initializers;
 import net.minecraft.server.v1_13_R2.DataWatcher;
 import net.minecraft.server.v1_13_R2.DataWatcherObject;
 import net.minecraft.server.v1_13_R2.DataWatcherRegistry;
@@ -14,7 +15,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-public class PlayerController {
+public class PlayerController implements Initializers {
 
     private MapUI mapUI;
     private Player player;
@@ -52,8 +53,13 @@ public class PlayerController {
         this.entityPlayerDataWatcher = ((CraftPlayer) player).getHandle().getDataWatcher();
     }
 
+    @Override
     public void init() {
         temporaryDataWatcher.register(baseDataWatcherObject, (byte) 0);
+    }
+
+    @Override
+    public void deinit() {
     }
 
     public void onUIOpen() {

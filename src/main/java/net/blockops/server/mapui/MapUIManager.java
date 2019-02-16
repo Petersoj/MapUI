@@ -2,6 +2,7 @@ package net.blockops.server.mapui;
 
 import net.blockops.server.mapui.art.SmallMinecraftFont;
 import net.blockops.server.mapui.map.MapUI;
+import net.blockops.server.mapui.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapRenderer;
@@ -11,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
-public class MapUIManager {
+public class MapUIManager implements Initializers {
 
     private Plugin plugin;
     private short emptyMapID;
@@ -33,9 +34,10 @@ public class MapUIManager {
         this.playerMapUIs = new HashMap<>();
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public void init() {
-        mapUIEventListener.registerEvents();
+        mapUIEventListener.init();
 
         mapView = Bukkit.getMap(emptyMapID); // Deprecated, but it shouldn't be...
         if (mapView == null) {
@@ -48,6 +50,7 @@ public class MapUIManager {
         mapView.addRenderer(mainRenderer);
     }
 
+    @Override
     public void deinit() {
         for (MapUI mapUI : playerMapUIs.values()) {
             if (mapUI.isOpen()) {

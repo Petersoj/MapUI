@@ -1,6 +1,7 @@
 package net.blockops.server.mapui.map;
 
 import net.blockops.server.mapui.MapUIManager;
+import net.blockops.server.mapui.util.Initializers;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,10 +10,11 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class MapUI {
+public class MapUI implements Initializers {
 
     private MapUIManager mapUIManager;
     private Player player;
+    private boolean doRegisterMap;
 
     private BukkitTask updateTask;
     private PlayerController playerController;
@@ -21,16 +23,18 @@ public class MapUI {
     private ItemStack mapItem;
     private boolean isOpen = false;
 
-    public MapUI(MapUIManager mapUIManager, Player player) {
+    public MapUI(MapUIManager mapUIManager, Player player, boolean doRegisterMap) {
         this.mapUIManager = mapUIManager;
         this.player = player;
+        this.doRegisterMap = doRegisterMap;
 
         this.playerController = new PlayerController(this);
         this.viewController = new ViewController(this);
         this.mapPeripheralBlock = new MapPeripheralBlock(this);
     }
 
-    public void init(boolean doRegisterMap) {
+    @Override
+    public void init() {
         if (doRegisterMap) {
             this.mapUIManager.registerPlayerMapUI(player, this);
         }

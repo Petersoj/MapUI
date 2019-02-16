@@ -1,5 +1,6 @@
 package net.blockops.server.mapui;
 
+import net.blockops.server.mapui.util.Initializers;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,7 +16,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-public class MapUIEventListener implements Listener {
+public class MapUIEventListener implements Listener, Initializers {
 
     private MapUIManager mapUIManager;
     private MapUIEventHandlers mapUIEventHandlers;
@@ -25,8 +26,13 @@ public class MapUIEventListener implements Listener {
         this.mapUIEventHandlers = mapUIManager.getMapUIEventHandlers();
     }
 
-    protected void registerEvents() {
+    @Override
+    public void init() {
         Bukkit.getPluginManager().registerEvents(this, mapUIManager.getPlugin());
+    }
+
+    @Override
+    public void deinit() {
     }
 
     @EventHandler
