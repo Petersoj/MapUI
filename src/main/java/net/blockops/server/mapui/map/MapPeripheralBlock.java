@@ -36,6 +36,10 @@ public class MapPeripheralBlock {
     // Create client side EntityArmorStand with vision block item on head (to prevent player
     // from seeing the outside world movement when moving the cursor on the map)
     public void createPeripheralBlockArmorStand() {
+        if (peripheralBlockItem == null) {
+            return;
+        }
+
         Location cursorCenterLocation = mapUI.getPlayerController().getCursorCenterLocation().clone();
         if (peripheralBlockLocOffset != null) {
             cursorCenterLocation.add(peripheralBlockLocOffset);
@@ -66,7 +70,9 @@ public class MapPeripheralBlock {
     }
 
     public void destroyPeripheralBlockArmorStand() {
-        peripheralBlockArmorStand.remove();
+        if (peripheralBlockArmorStand != null) {
+            peripheralBlockArmorStand.remove();
+        }
     }
 
     public ArmorStand getPeripheralBlockArmorStand() {

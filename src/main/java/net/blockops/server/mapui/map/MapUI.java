@@ -132,6 +132,10 @@ public class MapUI {
         return mapPeripheralBlock;
     }
 
+    public void setMapPeripheralBlock(MapPeripheralBlock mapPeripheralBlock) {
+        this.mapPeripheralBlock = mapPeripheralBlock;
+    }
+
     public ItemStack getMapItem() {
         return mapItem;
     }
