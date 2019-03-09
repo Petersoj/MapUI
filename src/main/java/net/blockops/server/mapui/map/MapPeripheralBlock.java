@@ -22,6 +22,7 @@ public class MapPeripheralBlock {
     private ItemStack peripheralBlockItem;
     private Location peripheralBlockLocOffset;
     private EulerAngle peripheralBlockHeadPose;
+    private boolean disabled;
 
     public MapPeripheralBlock(MapUI mapUI) {
         this.mapUI = mapUI;
@@ -31,12 +32,13 @@ public class MapPeripheralBlock {
         this.peripheralBlockItem = new ItemStack(Material.BLACK_CONCRETE);
         this.peripheralBlockLocOffset = new Location(player.getWorld(), 0.15, 0.27, -0.2);
         this.peripheralBlockHeadPose = new EulerAngle(20d, 0, 0);
+        this.disabled = false;
     }
 
     // Create client side EntityArmorStand with vision block item on head (to prevent player
     // from seeing the outside world movement when moving the cursor on the map)
     public void createPeripheralBlockArmorStand() {
-        if (peripheralBlockItem == null) {
+        if (peripheralBlockItem == null || disabled) {
             return;
         }
 
@@ -70,7 +72,7 @@ public class MapPeripheralBlock {
     }
 
     public void destroyPeripheralBlockArmorStand() {
-        if (peripheralBlockArmorStand != null) {
+        if (peripheralBlockArmorStand != null && !disabled) {
             peripheralBlockArmorStand.remove();
         }
     }
@@ -103,4 +105,11 @@ public class MapPeripheralBlock {
         this.peripheralBlockHeadPose = peripheralBlockHeadPose;
     }
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
 }
