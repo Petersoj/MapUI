@@ -72,7 +72,7 @@ public class MapPeripheralBlock {
     }
 
     public void destroyPeripheralBlockArmorStand() {
-        if (peripheralBlockArmorStand != null && !disabled) {
+        if (peripheralBlockArmorStand != null) {
             peripheralBlockArmorStand.remove();
         }
     }
