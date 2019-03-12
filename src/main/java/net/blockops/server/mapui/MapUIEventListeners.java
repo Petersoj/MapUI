@@ -16,12 +16,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-public class MapUIEventListener implements Listener, Initializers {
+public class MapUIEventListeners implements Listener, Initializers {
 
     private MapUIManager mapUIManager;
     private MapUIEventHandlers mapUIEventHandlers;
 
-    protected MapUIEventListener(MapUIManager mapUIManager) {
+    protected MapUIEventListeners(MapUIManager mapUIManager) {
         this.mapUIManager = mapUIManager;
         this.mapUIEventHandlers = mapUIManager.getMapUIEventHandlers();
     }

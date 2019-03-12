@@ -10,7 +10,6 @@ import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
-import java.util.NoSuchElementException;
 
 public class MapUIManager implements Initializers {
 
@@ -19,7 +18,7 @@ public class MapUIManager implements Initializers {
     private MapView mapView;
 
     private static SmallMinecraftFont smallMinecraftFont;
-    private MapUIEventListener mapUIEventListener;
+    private MapUIEventListeners mapUIEventListeners;
     private MapUIEventHandlers mapUIEventHandlers;
     private MainRenderer mainRenderer;
     private HashMap<Player, MapUI> playerMapUIs;
@@ -29,7 +28,7 @@ public class MapUIManager implements Initializers {
         this.emptyMapID = emptyMapID;
 
         this.mapUIEventHandlers = new MapUIEventHandlers(this);
-        this.mapUIEventListener = new MapUIEventListener(this);
+        this.mapUIEventListeners = new MapUIEventListeners(this);
         this.mainRenderer = new MainRenderer(this);
         this.playerMapUIs = new HashMap<>();
     }
@@ -37,11 +36,11 @@ public class MapUIManager implements Initializers {
     @Override
     @SuppressWarnings("deprecation")
     public void init() {
-        mapUIEventListener.init();
+        mapUIEventListeners.init();
 
         mapView = Bukkit.getMap(emptyMapID); // Deprecated, but it shouldn't be...
         if (mapView == null) {
-            throw new NoSuchElementException("Map ID: " + emptyMapID +
+            throw new IllegalArgumentException("Map ID: " + emptyMapID +
                     " does not exist! Create a map first and then pass a valid Map ID please!");
         }
         for (MapRenderer mapRenderer : mapView.getRenderers()) {
@@ -53,10 +52,7 @@ public class MapUIManager implements Initializers {
     @Override
     public void deinit() {
         for (MapUI mapUI : playerMapUIs.values()) {
-            if (mapUI.isOpen()) {
-                mapUI.close();
-                mapUI.deinit();
-            }
+            mapUI.deinit();
         }
         playerMapUIs.clear();
         if (mapView != null) {

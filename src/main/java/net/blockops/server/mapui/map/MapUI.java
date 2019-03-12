@@ -14,7 +14,6 @@ public class MapUI implements Initializers {
 
     private MapUIManager mapUIManager;
     private Player player;
-    private boolean doRegisterMap;
 
     private BukkitTask updateTask;
     private PlayerController playerController;
@@ -23,10 +22,9 @@ public class MapUI implements Initializers {
     private ItemStack mapItem;
     private boolean isOpen = false;
 
-    public MapUI(MapUIManager mapUIManager, Player player, boolean doRegisterMap) {
+    public MapUI(MapUIManager mapUIManager, Player player) {
         this.mapUIManager = mapUIManager;
         this.player = player;
-        this.doRegisterMap = doRegisterMap;
 
         this.playerController = new PlayerController(this);
         this.viewController = new ViewController(this);
@@ -35,17 +33,12 @@ public class MapUI implements Initializers {
 
     @Override
     public void init() {
-        if (doRegisterMap) {
-            this.mapUIManager.registerPlayerMapUI(player, this);
-        }
-        this.playerController.init();
+        playerController.init();
     }
 
     public void deinit() {
-        if (isOpen) {
-            this.close();
-        }
-        mapUIManager.deregisterPlayerMapUI(player);
+        this.close();
+        playerController.deinit();
     }
 
     public void open(String mapItemName, boolean createUpdateTask, int motionlessCloseTicks) {
@@ -53,39 +46,41 @@ public class MapUI implements Initializers {
 
         this.createMapItem(mapItemName);
 
-        this.playerController.configureLocations(player.getLocation());
-        this.mapPeripheralBlock.createPeripheralBlockArmorStand();
-        this.playerController.onUIOpen();
+        playerController.configureLocations(player.getLocation());
+        mapPeripheralBlock.createPeripheralBlockArmorStand();
+        playerController.onUIOpen();
 
         if (createUpdateTask) {
             this.createUpdateTask(motionlessCloseTicks);
         }
 
-        this.isOpen = true;
+        isOpen = true;
     }
 
     public void update() {
         Validate.isTrue(isOpen, "MapUI must be open in order to update it!");
 
-        this.playerController.update();
-        this.viewController.update();
+        playerController.update();
+        viewController.update();
     }
 
     public void close() {
-        Validate.isTrue(isOpen, "MapUI must be open in order to close it!");
+        if (!isOpen) {
+            return;
+        }
 
-        this.playerController.onUIClose();
-        this.mapPeripheralBlock.destroyPeripheralBlockArmorStand();
+        playerController.onUIClose();
+        mapPeripheralBlock.destroyPeripheralBlockArmorStand();
 
         if (updateTask != null) {
             updateTask.cancel();
         }
 
-        this.isOpen = false;
+        isOpen = false;
     }
 
     public void onClick() {
-        this.viewController.onClick();
+        viewController.onClick();
     }
 
     private void createMapItem(String mapItemName) {
