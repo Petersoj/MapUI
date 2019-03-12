@@ -91,10 +91,6 @@ public class MapUIManager implements Initializers {
         return playerMapUIs.get(player);
     }
 
-    public boolean isPlayerMapUIRegistered(MapUI mapUI) {
-        return playerMapUIs.containsValue(mapUI);
-    }
-
     public boolean isMapUIPlayerRegistered(Player player) {
         return playerMapUIs.containsKey(player);
     }
