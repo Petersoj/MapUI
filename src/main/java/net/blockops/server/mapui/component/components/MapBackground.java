@@ -14,12 +14,12 @@ public class MapBackground extends MapComponent {
 
     public MapBackground(byte backgroundColor) {
         this.backgroundColor = backgroundColor;
-        super.setComponentBounds(0, 0, 128, 128);
+        super.setComponentBounds(0, 0, 127, 127);
     }
 
     @Override
     public void draw(MapCanvas mapCanvas) {
-        this.drawRectangle(mapCanvas, getX(), getY(), getWidth(), getHeight(), true, backgroundColor);
+        this.fillRectangle(mapCanvas, getX(), getY(), getWidth(), getHeight(), backgroundColor);
     }
 
     public byte getBackgroundColor() {

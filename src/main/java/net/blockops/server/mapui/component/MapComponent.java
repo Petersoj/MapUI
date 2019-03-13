@@ -41,22 +41,34 @@ public abstract class MapComponent {
         }
     }
 
-    protected void drawRectangle(MapCanvas mapCanvas, Rectangle rectangle, boolean fill, byte color) {
-        this.drawRectangle(mapCanvas, rectangle.x, rectangle.y, rectangle.width, rectangle.height, fill, color);
+    protected void drawRectangle(MapCanvas mapCanvas, Rectangle rectangle, byte color) {
+        this.drawRectangle(mapCanvas, rectangle.x, rectangle.y, rectangle.width, rectangle.height, color);
     }
 
-    protected void drawRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, boolean fill, byte color) {
-        for (int xx = x; xx < width + x; xx++) {
-            for (int yy = y; yy < height + y; yy++) {
-                if (fill) {
-                    mapCanvas.setPixel(xx, yy, color);
-                } else {
-                    if (yy == y || yy == y + height - 1) {
-                        mapCanvas.setPixel(xx, yy, color);
-                    } else if (xx == x || xx == x + width - 1) {
-                        mapCanvas.setPixel(xx, yy, color);
-                    }
-                }
+    protected void drawRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, byte color) {
+        for (int xi = x; xi <= x + width; xi++) {
+            mapCanvas.setPixel(xi, y, color);
+            mapCanvas.setPixel(xi, y + height, color);
+        }
+        for (int yi = y; yi <= y + height; yi++) {
+            mapCanvas.setPixel(x, yi, color);
+            mapCanvas.setPixel(x + width, yi, color);
+        }
+    }
+
+    protected void drawThickRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, int thickness, byte color) {
+        // TODO drawThickRectangle
+        throw new UnsupportedOperationException("Not implemented yet!");
+    }
+
+    protected void fillRectangle(MapCanvas mapCanvas, Rectangle rectangle, byte color) {
+        this.fillRectangle(mapCanvas, rectangle.x, rectangle.y, rectangle.width, rectangle.height, color);
+    }
+
+    protected void fillRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, byte color) {
+        for (int xi = x; xi <= x + width; xi++) {
+            for (int yi = y; yi <= y + height; yi++) {
+                mapCanvas.setPixel(xi, yi, color);
             }
         }
     }

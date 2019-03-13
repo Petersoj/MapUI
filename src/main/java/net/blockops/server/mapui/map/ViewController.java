@@ -37,40 +37,35 @@ public class ViewController {
             mapComponent.update(); // Convenience method for some MapComponents that need to update every tick
         }
 
-        if (playerController.didPlayerDirectionChange()) {
-            if (mapCursor != null) {
+        if (playerController.didPlayerDirectionChange() && mapCursor != null) {
+            mapCursor.setLocation(playerController.getCursorX(), playerController.getCursorY());
 
-                mapCursor.setLocation(playerController.getCursorX(), playerController.getCursorY());
+            if (!dirty && !mapCursor.isHidden()) {
+                mapCursor.drawPreviousPixels(mapCanvas);
+                mapCursor.drawCurrentPixels(mapCanvas);
+            }
 
-                if (!dirty && !mapCursor.isHidden()) {
-                    mapCursor.drawPreviousPixels(mapCanvas);
-                    mapCursor.drawCurrentPixels(mapCanvas);
-                }
+            // Button hovering
+            MapButton topMostHoveredButton = null;
+            for (MapComponent mapComponent : mapComponents) {
+                if (mapComponent instanceof MapButton) {
+                    MapButton mapButton = (MapButton) mapComponent;
 
-                // Button hovering
-                MapButton topMostHoveredButton = null;
-                for (MapComponent mapComponent : mapComponents) {
-                    if (mapComponent instanceof MapButton) {
-                        MapButton mapButton = (MapButton) mapComponent;
+                    mapCursor.updateCursorSensitivityLocation();
 
-                        mapCursor.updateCursorSensitivityLocation();
-
-                        if (mapButton.getClickBounds().intersects(mapCursor.getCursorSensitivityBounds())) {
-                            topMostHoveredButton = mapButton;
-                        } else {
-                            if (mapButton.isHovered()) {
-                                mapButton.setHovered(false);
-                                mapButton.onHoverExit(mapUI, mapCursor);
-                                dirty = true;
-                            }
+                    if (mapButton.getClickBounds().intersects(mapCursor.getCursorSensitivityBounds())) {
+                        topMostHoveredButton = mapButton;
+                    } else {
+                        if (mapButton.isHovered()) {
+                            mapButton.setHovered(false);
+                            mapButton.onHoverExit(mapUI, mapCursor);
                         }
                     }
                 }
-                if (topMostHoveredButton != null && !topMostHoveredButton.isHovered()) {
-                    topMostHoveredButton.setHovered(true);
-                    topMostHoveredButton.onHoverEnter(mapUI, mapCursor);
-                    dirty = true;
-                }
+            }
+            if (topMostHoveredButton != null && !topMostHoveredButton.isHovered()) {
+                topMostHoveredButton.setHovered(true);
+                topMostHoveredButton.onHoverEnter(mapUI, mapCursor);
             }
         }
 
