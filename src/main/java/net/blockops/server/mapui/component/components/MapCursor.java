@@ -76,6 +76,10 @@ public class MapCursor extends MapComponent {
         cursorSensitivityBounds.y = relativeCursorSensitivityBounds.y + getY();
     }
 
+    public void setCursorSensitivityBounds(Rectangle rectangle) {
+        this.setCursorSensitivityBounds(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    }
+
     public void setCursorSensitivityBounds(int relativeX, int relativeY, int width, int height) {
         this.relativeCursorSensitivityBounds.x = relativeX;
         this.relativeCursorSensitivityBounds.y = relativeY;
@@ -88,6 +92,10 @@ public class MapCursor extends MapComponent {
 
     public Rectangle getCursorSensitivityBounds() {
         return cursorSensitivityBounds;
+    }
+
+    public Rectangle getRelativeCursorSensitivityBounds() {
+        return relativeCursorSensitivityBounds;
     }
 
     public byte[][] getCursorPixels() {
