@@ -1,9 +1,9 @@
 package net.blockops.server.mapui.component;
 
-import com.sun.javafx.geom.Vec2f;
 import org.bukkit.map.MapCanvas;
 
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 
 public abstract class MapComponent {
 
@@ -70,12 +70,54 @@ public abstract class MapComponent {
         throw new UnsupportedOperationException("Not implemented yet!");
     }
 
-    protected void drawLine(MapCanvas mapCanvas, int x1, int y1, int x2, int y2, int thickness, byte color) {
-        // TODO drawLine
-        Vec2f start = new Vec2f(x1, y1);
-        Vec2f end = new Vec2f(x2, y2);
+    protected void drawLine(MapCanvas mapCanvas, int x1, int y1, int x2, int y2, byte color) {
+        this.drawLine(mapCanvas, x1, y1, x2, y1, 1, color);
+    }
 
-        throw new UnsupportedOperationException("Not implemented yet!");
+    protected void drawLine(MapCanvas mapCanvas, int x1, int y1, int x2, int y2, int thickness, byte color) {
+        if (thickness < 1) {
+            return;
+        }
+        Point2D start = new Point2D.Float(x1, y1);
+        Point2D end = new Point2D.Float(x2, y2);
+
+        double halfThickness = (double) thickness / 2;
+        double distance = start.distance(end);
+        if (distance == 0) {
+            return;
+        }
+        double dx = (double) (x2 - x1) / distance;
+        double dy = (double) (y2 - y1) / distance;
+
+        double currentX = start.getX();
+        double currentY = start.getY();
+
+        for (double i = 0; i < distance; i++) {
+            if (thickness > 1) {
+                double accuracy = 2.5d;
+                double preciseDX = dx / accuracy;
+                double preciseDY = dy / accuracy;
+
+                double perpX1 = currentX;
+                double perpY1 = currentY;
+                for (int perpIndex = 0; perpIndex < halfThickness * accuracy; perpIndex++) {
+                    perpX1 += preciseDY;
+                    perpY1 -= preciseDX;
+                    mapCanvas.setPixel((int) Math.round(perpX1), (int) Math.round(perpY1), color);
+                }
+
+                double perpX2 = currentX;
+                double perpY2 = currentY;
+                for (int perpIndex = 0; perpIndex < halfThickness * accuracy; perpIndex++) {
+                    perpX2 -= preciseDY;
+                    perpY2 += preciseDX;
+                    mapCanvas.setPixel((int) Math.round(perpX2), (int) Math.round(perpY2), color);
+                }
+            }
+            mapCanvas.setPixel((int) Math.round(currentX), (int) Math.round(currentY), color);
+            currentX += dx;
+            currentY += dy;
+        }
     }
 
     public void centerHorizontallyTo(int leftX, int width) {
