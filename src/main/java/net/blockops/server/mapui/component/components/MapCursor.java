@@ -18,7 +18,7 @@ public class MapCursor extends MapComponent {
 
     @Override
     public void draw(MapCanvas mapCanvas) {
-        return; // ViewController will handle all the Cursor updating
+        // ViewController will handle all the Cursor updating
     }
 
     // Because MapCursor will likely be drawn so often and redrawing all mapComponents is expensive, MapCursor's
@@ -72,6 +72,7 @@ public class MapCursor extends MapComponent {
     }
 
     public void updateCursorSensitivityLocation() {
+        // Update only X and Y change here because width and height are static
         cursorSensitivityBounds.x = relativeCursorSensitivityBounds.x + getX();
         cursorSensitivityBounds.y = relativeCursorSensitivityBounds.y + getY();
     }
@@ -86,6 +87,7 @@ public class MapCursor extends MapComponent {
         this.relativeCursorSensitivityBounds.width = width;
         this.relativeCursorSensitivityBounds.height = height;
 
+        // Set the width and height of absolute cursor sensitivity bounds because they are static
         this.cursorSensitivityBounds.width = width;
         this.cursorSensitivityBounds.height = height;
     }

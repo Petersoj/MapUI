@@ -18,48 +18,50 @@ public class ViewController {
     private ArrayList<MapComponent> mapComponents;
     private MapCanvas mapCanvas;
     private MapCursor mapCursor;
-    private MapBackground mapBackground = new MapBackground(MapUIColors.TRANSPARENT); // Default transparent background
-    private boolean dirty = true;
+    private MapBackground mapBackground;
+    private boolean dirty;
 
     public ViewController(MapUI mapUI) {
         this.mapUI = mapUI;
 
         this.playerController = mapUI.getPlayerController();
         this.mapComponents = new ArrayList<>();
+        this.mapBackground = new MapBackground(MapUIColors.TRANSPARENT); // Default transparent background
+        this.dirty = true;
     }
 
     protected void update() {
-        if (mapCanvas == null) {
+        if (mapCanvas == null) { // MapCanvas will be set by the MainRenderer class
             return;
         }
 
+        // Update all components first
         for (MapComponent mapComponent : mapComponents) {
             mapComponent.update(); // Convenience method for some MapComponents that need to update every tick
         }
 
-        if (playerController.didPlayerDirectionChange() && mapCursor != null) {
+        // Handle MapCursor
+        if (mapCursor != null && playerController.didPlayerDirectionChange()) {
             mapCursor.setLocation(playerController.getCursorX(), playerController.getCursorY());
+            mapCursor.updateCursorSensitivityLocation();
 
+            // Update raster to display cursor if raster is not dirty
             if (!dirty && !mapCursor.isHidden()) {
                 mapCursor.drawPreviousPixels(mapCanvas);
                 mapCursor.drawCurrentPixels(mapCanvas);
             }
 
-            // Button hovering
+            // Handle Button hovering
             MapButton topMostHoveredButton = null;
             for (MapComponent mapComponent : mapComponents) {
                 if (mapComponent instanceof MapButton) {
                     MapButton mapButton = (MapButton) mapComponent;
 
-                    mapCursor.updateCursorSensitivityLocation();
-
                     if (mapButton.getClickBounds().intersects(mapCursor.getCursorSensitivityBounds())) {
                         topMostHoveredButton = mapButton;
-                    } else {
-                        if (mapButton.isHovered()) {
-                            mapButton.setHovered(false);
-                            mapButton.onHoverExit(mapUI, mapCursor);
-                        }
+                    } else if (mapButton.isHovered()) {
+                        mapButton.setHovered(false);
+                        mapButton.onHoverExit(mapUI, mapCursor);
                     }
                 }
             }
@@ -103,7 +105,6 @@ public class ViewController {
                 if (mapButton.isHovered()) { // Only one button is allowed to be hovered over at a time
                     mapButton.setClicked(true);
                     mapButton.onClick(mapUI, mapCursor);
-                    dirty = true;
                     break;
                 }
             }
