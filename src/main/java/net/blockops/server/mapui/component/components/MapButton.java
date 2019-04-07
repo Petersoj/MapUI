@@ -8,8 +8,8 @@ import java.awt.Rectangle;
 public abstract class MapButton extends MapComponent {
 
     private Rectangle clickBounds;
-    private boolean hovered;
-    private boolean clicked;
+    protected boolean hovered;
+    protected boolean clicked;
 
     public MapButton(Rectangle bounds) {
         this(bounds.x, bounds.y, bounds.width, bounds.height);

@@ -178,6 +178,10 @@ public abstract class MapComponent {
         this.componentBounds.setBounds(x, y, width, height);
     }
 
+    public void setComponentBounds(Rectangle componentBounds) {
+        this.componentBounds = componentBounds;
+    }
+
     public Rectangle getComponentBounds() {
         return componentBounds;
     }
