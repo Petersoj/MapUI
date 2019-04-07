@@ -46,11 +46,11 @@ public abstract class MapComponent {
     }
 
     protected void drawRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, byte color) {
-        for (int xi = x; xi <= x + width; xi++) {
+        for (int xi = x; xi < x + width; xi++) {
             mapCanvas.setPixel(xi, y, color);
             mapCanvas.setPixel(xi, y + height, color);
         }
-        for (int yi = y; yi <= y + height; yi++) {
+        for (int yi = y; yi < y + height; yi++) {
             mapCanvas.setPixel(x, yi, color);
             mapCanvas.setPixel(x + width, yi, color);
         }
@@ -66,8 +66,8 @@ public abstract class MapComponent {
     }
 
     protected void fillRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, byte color) {
-        for (int xi = x; xi <= x + width; xi++) {
-            for (int yi = y; yi <= y + height; yi++) {
+        for (int xi = x; xi < x + width; xi++) {
+            for (int yi = y; yi < y + height; yi++) {
                 mapCanvas.setPixel(xi, yi, color);
             }
         }
@@ -83,7 +83,7 @@ public abstract class MapComponent {
     }
 
     protected void drawLine(MapCanvas mapCanvas, int x1, int y1, int x2, int y2, byte color) {
-        this.drawLine(mapCanvas, x1, y1, x2, y1, 1, color);
+        this.drawLine(mapCanvas, x1, y1, x2, y2, 1, color);
     }
 
     protected void drawLine(MapCanvas mapCanvas, int x1, int y1, int x2, int y2, int thickness, byte color) {
