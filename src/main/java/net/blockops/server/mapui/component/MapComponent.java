@@ -48,11 +48,11 @@ public abstract class MapComponent {
     protected void drawRectangle(MapCanvas mapCanvas, int x, int y, int width, int height, byte color) {
         for (int xi = x; xi < x + width; xi++) {
             mapCanvas.setPixel(xi, y, color);
-            mapCanvas.setPixel(xi, y + height, color);
+            mapCanvas.setPixel(xi, y + height - 1, color);
         }
         for (int yi = y; yi < y + height; yi++) {
             mapCanvas.setPixel(x, yi, color);
-            mapCanvas.setPixel(x + width, yi, color);
+            mapCanvas.setPixel(x + width - 1, yi, color);
         }
     }
 
