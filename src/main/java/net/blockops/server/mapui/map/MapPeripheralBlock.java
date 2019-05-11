@@ -1,11 +1,11 @@
 package net.blockops.server.mapui.map;
 
-import net.minecraft.server.v1_13_R2.EnumItemSlot;
-import net.minecraft.server.v1_13_R2.PacketPlayOutEntityEquipment;
+import net.minecraft.server.v1_14_R1.EnumItemSlot;
+import net.minecraft.server.v1_14_R1.PacketPlayOutEntityEquipment;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
