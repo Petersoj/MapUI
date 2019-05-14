@@ -4,6 +4,7 @@ import net.blockops.server.mapui.map.MapUI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -27,7 +28,7 @@ public class MapUIEventHandlers {
     }
 
     protected void onPlayerInteractEvent(PlayerInteractEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             event.setCancelled(true);
@@ -41,7 +42,7 @@ public class MapUIEventHandlers {
     }
 
     protected void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             event.setCancelled(true);
@@ -61,7 +62,7 @@ public class MapUIEventHandlers {
             }
         }
 
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             event.setCancelled(true);
@@ -73,7 +74,7 @@ public class MapUIEventHandlers {
     }
 
     protected void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player) {
+        if (event.getDamager() instanceof Player) { // If Player left-clicked MapPeripheralBlock/Armorstand
 
             MapUI mapUI = getPlayerMapUI((Player) event.getDamager());
 
@@ -83,8 +84,18 @@ public class MapUIEventHandlers {
         }
     }
 
+    protected void onEntityDamageEvent(EntityDamageEvent event) { // If another player damaged a MapUI Player
+        if (event.getEntity() instanceof Player) {
+            MapUI mapUI = getPlayerMapUI((Player) event.getEntity());
+
+            if (mapUI != null && mapUI.isOpen()) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     protected void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             mapUI.close();
@@ -92,7 +103,7 @@ public class MapUIEventHandlers {
     }
 
     protected void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             mapUI.close();
@@ -118,7 +129,7 @@ public class MapUIEventHandlers {
     }
 
     protected void onPlayerDropItemEvent(PlayerDropItemEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
         if (mapUI != null && mapUI.isOpen()) {
             // This event is somewhat troublesome with giving the player the item they used
             // to have back... so just cancel it and use 'Sneak' to officially close MapUI.
@@ -127,7 +138,7 @@ public class MapUIEventHandlers {
     }
 
     protected void onPlayerSwapItemEvent(PlayerSwapHandItemsEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             event.setCancelled(true); // Player should only use Drop Item 'Q' key to exit MapUI
@@ -143,7 +154,7 @@ public class MapUIEventHandlers {
     }
 
     private void onPlayerLeaveEvent(PlayerEvent event) {
-        MapUI mapUI = getPlayerMapUI(event.getPlayer());
+        MapUI mapUI = this.getPlayerMapUI(event.getPlayer());
 
         if (mapUI != null && mapUI.isOpen()) {
             mapUI.close();
