@@ -36,6 +36,7 @@ public class PlayerController implements Initializers {
     private float previousFlySpeed = defaultFlySpeed;
     private Vector previousVelocityVector;
     private int playerMoveIssueCount;
+    private boolean damageCanceled = true;
     private boolean playerDirectionChanged;
     private int cursorX;
     private int cursorY;
@@ -276,5 +277,13 @@ public class PlayerController implements Initializers {
 
     public int getCursorY() {
         return cursorY;
+    }
+
+    public boolean isDamageCanceled() {
+        return damageCanceled;
+    }
+
+    public void setDamageCanceled(boolean damageCanceled) {
+        this.damageCanceled = damageCanceled;
     }
 }

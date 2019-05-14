@@ -88,7 +88,7 @@ public class MapUIEventHandlers {
         if (event.getEntity() instanceof Player) {
             MapUI mapUI = getPlayerMapUI((Player) event.getEntity());
 
-            if (mapUI != null && mapUI.isOpen()) {
+            if (mapUI != null && mapUI.isOpen() && mapUI.getPlayerController().isDamageCanceled()) {
                 event.setCancelled(true);
             }
         }
