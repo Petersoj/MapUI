@@ -1,17 +1,21 @@
 package net.blockops.server.mapui.map;
 
-import net.minecraft.server.v1_14_R1.EnumItemSlot;
-import net.minecraft.server.v1_14_R1.PacketPlayOutEntityEquipment;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.server.v1_16_R3.EnumItemSlot;
+import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapPeripheralBlock {
 
@@ -30,7 +34,9 @@ public class MapPeripheralBlock {
 
         // Defaults
         this.peripheralBlockItem = new ItemStack(Material.BLACK_CONCRETE);
-        this.peripheralBlockLocOffset = new Location(player.getWorld(), 0.15, 0.27, -0.2);
+        //this.peripheralBlockLocOffset = new Location(player.getWorld(), 0.15, 0.27, -0.2);
+        //this.peripheralBlockHeadPose = new EulerAngle(20d, 0, 0);
+        this.peripheralBlockLocOffset = new Location(player.getWorld(), 0, 0, 0);
         this.peripheralBlockHeadPose = new EulerAngle(20d, 0, 0);
         this.disabled = false;
     }
@@ -62,9 +68,11 @@ public class MapPeripheralBlock {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    List<Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>> equipmentList = new ArrayList<>();
+                    equipmentList.add(new Pair<>(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(peripheralBlockItem)));
+
                     PacketPlayOutEntityEquipment equipmentPacket =
-                            new PacketPlayOutEntityEquipment(peripheralBlockArmorStand.getEntityId(),
-                                    EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(peripheralBlockItem));
+                            new PacketPlayOutEntityEquipment(peripheralBlockArmorStand.getEntityId(), equipmentList);
                     ((CraftPlayer) player).getHandle().playerConnection.sendPacket(equipmentPacket);
                 }
             }.runTaskLater(mapUI.getMapUIManager().getPlugin(), 1);

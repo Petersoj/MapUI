@@ -1,0 +1,5 @@
+name: MapUI
+main: net.blockops.server.mapui.REMOVE
+version: 1.0
+description: MapUI
+api-version: 1.16

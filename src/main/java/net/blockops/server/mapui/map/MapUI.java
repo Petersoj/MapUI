@@ -83,6 +83,7 @@ public class MapUI implements Initializers {
         viewController.onClick();
     }
 
+    @SuppressWarnings("deprecation")
     private void createMapItem(String mapItemName) {
         mapItem = new ItemStack(Material.FILLED_MAP);
         MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
